@@ -29,6 +29,9 @@
             <a href="admin_config.php" class="nav-link">Administrar</a>
         </li>
         <li class="nav-item">
+            <a href="doc.php" class="nav-link">Ayuda</a>
+        </li>
+        <li class="nav-item">
             <form method="post" action="index.php" class="d-flex">
                 <input type="hidden" name="logout" value="1">
                 <button type="submit" class="btn btn-outline-danger">Cerrar sesión</button>

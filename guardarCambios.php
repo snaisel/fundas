@@ -9,15 +9,12 @@ error_reporting(E_ALL);
 if (isset($_POST['idMarca']) && isset($_POST['nombreMarca'])) {
     $idMarca = $_POST['idMarca'];
     $nombreMarca = $_POST['nombreMarca'];
-
     // Conexión a la base de datos
     $conn = getdb();
-
     // Verifica la conexión
     if ($conn->connect_error) {
         die("Conexión fallida: " . $conn->connect_error);
     }
-
     // Actualizar la marca
     $sql = "UPDATE marca SET nombreMarca = ? WHERE idMarca = ?";
     $stmt = $conn->prepare($sql);
@@ -36,24 +33,42 @@ if (isset($_POST['idMarca']) && isset($_POST['nombreMarca'])) {
 } else {
     echo "Datos no recibidos correctamente";
 }
-if (isset($_POST['idModelo']) && isset($_POST['nombreModelo'])) {
-    $idModelo = $_POST['idModelo'];
-    $nombreModelo = $_POST['nombreModelo'];
-// Conexión a la base de datos
+if (isset($_POST['idYear']) && isset($_POST['year'])) {
+    $idYear = $_POST['idYear'];
+    $year = $_POST['year'];
     $conn = getdb();
-// Verifica la conexión
     if ($conn->connect_error) {
         die("Conexión fallida: " . $conn->connect_error);
     }
-
-    // Actualizar la marca
-    $sql = "UPDATE modelo SET nombreModelo = ? WHERE idModelo = ?";
+    $sql = "UPDATE year SET year = ? WHERE idYear = ?";
     $stmt = $conn->prepare($sql);
 
     if ($stmt === false) {
         die("Error en la preparación de la consulta: " . $conn->error);
     }
-
+    $stmt->bind_param("si", $year, $idYear);
+    if ($stmt->execute()) {
+        echo "Registro actualizado exitosamente";
+    } else {
+        echo "Error al actualizar: " . $stmt->error;
+    }
+    $stmt->close();
+    $conn->close();
+} else {
+    echo "Datos no recibidos correctamente";
+}
+if (isset($_POST['idModelo']) && isset($_POST['nombreModelo'])) {
+    $idModelo = $_POST['idModelo'];
+    $nombreModelo = $_POST['nombreModelo'];
+    $conn = getdb();
+    if ($conn->connect_error) {
+        die("Conexión fallida: " . $conn->connect_error);
+    }
+    $sql = "UPDATE modelo SET nombreModelo = ? WHERE idModelo = ?";
+    $stmt = $conn->prepare($sql);
+    if ($stmt === false) {
+        die("Error en la preparación de la consulta: " . $conn->error);
+    }
     $stmt->bind_param("si", $nombreModelo, $idModelo);
 
     if ($stmt->execute()) {
@@ -61,7 +76,6 @@ if (isset($_POST['idModelo']) && isset($_POST['nombreModelo'])) {
     } else {
         echo "Error al actualizar: " . $stmt->error;
     }
-
     $stmt->close();
     $conn->close();
 } else {

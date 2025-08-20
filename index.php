@@ -58,20 +58,15 @@ if (!$con) {
                                 <?php
                                 $sql = "SELECT * FROM `marca` ORDER BY refMarca";
                                 $result = mysqli_query($con, $sql);
-                                if (mysqli_num_rows($result) == 0) {
-                                    echo "<div class='alert alert-warning'>No hay marcas disponibles</div>";
-                                } else {
-                                        echo "<div id='listadoMarcas' class='list-group' style='height:250px;overflow-y: scroll;margin:10px auto;'>";
-                                        while ($row = mysqli_fetch_assoc($result)) {
-                                            echo "<li class='list-group-item list-group-item-action'>";
-                                            echo "<button type=button value=" . $row['refMarca'] . " class=' btn btn-secondary botonListadoMarcas'>" . $row['refMarca'] . " - " . $row['nombreMarca'] . "</button>";
-                                            echo "<button type=button name='editarMarca' value=" . $row['idMarca'] . " class='botonEditarMarcas btn btn-success'>Editar</button>";
-                                        echo "<button type=button name='eliminarMarca' value=" . $row['idMarca'] . " class='botonEliminarMarcas btn btn-danger'>Eliminar</button>";
-                                        echo "</li>";
-                                    }
-
-                                    echo "</div>";
+                                echo "<div id='listadoMarcas' class='list-group' style='height:250px;overflow-y: scroll;margin:10px auto;'>";
+                                while ($row = mysqli_fetch_assoc($result)) {
+                                    echo "<li class='list-group-item list-group-item-action'>";
+                                    echo "<button type=button value=" . $row['refMarca'] . " class=' btn btn-secondary botonListadoMarcas'>" . $row['refMarca'] . " - " . $row['nombreMarca'] . "</button>";
+                                    echo "<button type=button name='editarMarca' value=" . $row['idMarca'] . " class='botonEditarMarcas btn btn-success'>Editar</button>";
+                                    echo "<button type=button name='eliminarMarca' value=" . $row['idMarca'] . " class='botonEliminarMarcas btn btn-danger'>Eliminar</button>";
+                                    echo "</li>";
                                 }
+                                echo "</div>";
                                 ?>
                                 <!-- Modal editar Marca -->
                                 <div class="modal fade" id="editarMarcaModal" tabindex="-1" aria-labelledby="editarMarcaModalLabel" aria-hidden="true">
@@ -110,20 +105,43 @@ if (!$con) {
                                 <?php
                                 $sql = "SELECT * FROM `year`";
                                 $result = mysqli_query($con, $sql);
-                                if (mysqli_num_rows($result) == 0) {
-                                    echo "<div class='alert alert-warning'>No hay años disponibles</div>";
-                                } else {
-                                    echo "<ul class='list-group' style='height:250px;overflow-y: scroll;margin:10px auto;'>";
-                                    while ($row = mysqli_fetch_assoc($result)) {
-                                        echo "<li class='list-group-item'>" . $row['refYear'] . " - " . $row['year'] . "</li>";
-                                    }
-                                    echo "</ul>";
+                                echo "<div id='listadoYear' class='list-group' style='height:250px;overflow-y: scroll;margin:10px auto;'>";
+                                while ($row = mysqli_fetch_assoc($result)) {
+                                    echo "<li class='list-group-item list-group-item-action'>";
+                                    echo "<button type=button value=" . $row['refYear'] . " class='btn btn-secondary botonListadoYear'>" . $row['refYear'] . " - " . $row['year'] . "</button>";
+                                    echo "<button type=button name='editarYear' value=" . $row['idYear'] . " class='botonEditarYear btn btn-success'>Editar</button>";
+                                    echo "<button type=button name='eliminarYear' value=" . $row['idYear'] . " class='botonEliminarYear btn btn-danger'>Eliminar</button>";
+                                    echo "</li>";
                                 }
+                                echo "</div>";
                                 ?>
-
                             </div>
                             <div class="card-footer">
                                 <a href="opciones.php" class="btn btn-primary">Añadir</a>
+                            </div>
+                        </div>
+                        <!-- Modal editar Año -->
+                        <div class="modal fade" id="editarYearModal" tabindex="-1" aria-labelledby="editarYearModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="editarYearModalLabel">Editar Año</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="formEditarYear">
+                                            <input type="hidden" id="idYear" name="idYear">
+                                            <div class="mb-3">
+                                                <label for="year" class="form-label">Nombre del Año</label>
+                                                <input type="text" class="form-control" id="year" name="year" required>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                        <button type="button" class="btn btn-primary" id="guardarCambiosYear">Guardar cambios</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -135,22 +153,18 @@ if (!$con) {
                                 $marca = "";
                                 $sql = "SELECT * FROM `modelo` ORDER BY `refMarca` ASC, `refYear` DESC, `nombreModelo`";
                                 $result = mysqli_query($con, $sql);
-                                if (mysqli_num_rows($result) == 0) {
-                                    echo "<div class='alert alert-warning'>No hay modelos disponibles</div>";
-                                } else {
-                                    echo "<ul class='list-group' style='height:250px;overflow-y: scroll;margin:10px auto;'><li><ul>";
-                                    while ($row = mysqli_fetch_assoc($result)) {
-                                        if ($marca != $row['refMarca']) {
-                                            $marca = $row['refMarca'];
-                                            echo "</ul></li><li class='list-group-item'>" . get_marca_name($marca) . "<ul class='list-group'>";
-                                        }
-                                        echo "<li class='list-group-item'>" . $row['refMarca'] . $row['refYear'] . $row['refModelo'] . " - " . $row['nombreModelo'];
-                                        echo "<div><button type=button name='editarModelo' value=" . $row['idModelo'] . " class='botonEditarModelos btn btn-sm btn-success'>Editar</button>";
-                                        echo "<button type=button name='eliminarMarca' value=" . $row['idModelo'] . " class='botonEliminarModelos btn btn-sm btn-danger'>Eliminar</button>";
-                                        echo "<div></li>";
+                                echo "<ul class='list-group' style='height:250px;overflow-y: scroll;margin:10px auto;'><li><ul>";
+                                while ($row = mysqli_fetch_assoc($result)) {
+                                    if ($marca != $row['refMarca']) {
+                                        $marca = $row['refMarca'];
+                                        echo "</ul></li><li class='list-group-item'>" . get_marca_name($marca) . "<ul class='list-group'>";
                                     }
-                                    echo "</ul>";
+                                    echo "<li class='list-group-item'>" . $row['refMarca'] . $row['refYear'] . $row['refModelo'] . " - " . $row['nombreModelo'];
+                                    echo "<div><button type=button name='editarModelo' value=" . $row['idModelo'] . " class='botonEditarModelos btn btn-sm btn-success'>Editar</button>";
+                                    echo "<button type=button name='eliminarMarca' value=" . $row['idModelo'] . " class='botonEliminarModelos btn btn-sm btn-danger'>Eliminar</button>";
+                                    echo "<div></li>";
                                 }
+                                echo "</ul>";
                                 ?>
 
                             </div>
@@ -190,18 +204,14 @@ if (!$con) {
                                 <?php
                                 $sql = "SELECT * FROM `tipo`";
                                 $result = mysqli_query($con, $sql);
-                                if (mysqli_num_rows($result) == 0) {
-                                    echo "<span class='alert alert-warning'>No hay tipos disponibles</span>";
-                                } else {
-                                    echo "<ul class='list-group' id='listadoTipos' style='height:250px;overflow-y: scroll;margin:10px auto;'>";
-                                    while ($row = mysqli_fetch_assoc($result)) {
-                                        echo "<li class='list-group-item'>" . $row['refTipo'] . " - " . $row['nombreTipo'] . " - " . $row['pvp'] . "<div> "
-                                            . "<button type='button' name='editarTipo' value='" . $row['idTipo'] . "' class='botonEditarTipos btn btn-sm btn-success' data-bs-toggle='modal' data-bs-target='#editarTipoModal'>Editar</button>"
-                                            . "<button type='button' name='eliminarTipo' value='" . $row['idTipo'] . "' class='botonEliminarTipos btn btn-sm btn-danger'>Eliminar</button>"
-                                            . "</div></li>";
-                                    }
-                                    echo "</ul>";
+                                echo "<ul class='list-group' id='listadoTipos' style='height:250px;overflow-y: scroll;margin:10px auto;'>";
+                                while ($row = mysqli_fetch_assoc($result)) {
+                                    echo "<li class='list-group-item'>" . $row['refTipo'] . " - " . $row['nombreTipo'] . " - " . $row['pvp'] . "<div> "
+                                        . "<button type='button' name='editarTipo' value='" . $row['idTipo'] . "' class='botonEditarTipos btn btn-sm btn-success' data-bs-toggle='modal' data-bs-target='#editarTipoModal'>Editar</button>"
+                                        . "<button type='button' name='eliminarTipo' value='" . $row['idTipo'] . "' class='botonEliminarTipos btn btn-sm btn-danger'>Eliminar</button>"
+                                        . "</div></li>";
                                 }
+                                echo "</ul>";
                                 ?>
                                 <!-- Modal para editar tipo -->
                                 <div class="modal fade" id="editarTipoModal" tabindex="-1" aria-labelledby="editarTipoModalLabel" aria-hidden="true">
@@ -242,18 +252,14 @@ if (!$con) {
                                 <?php
                                 $sql = "SELECT * FROM `color`";
                                 $result = mysqli_query($con, $sql);
-                                if (mysqli_num_rows($result) == 0) {
-                                    echo "<span class='alert alert-warning'>No hay colores disponibles</span>";
-                                } else {
-                                    echo "<ul class='list-group' id='listadoColores' style='height:250px;overflow-y: scroll;margin:10px auto;'>";
-                                    while ($row = mysqli_fetch_assoc($result)) {
-                                        echo "<li class='list-group-item' >" . $row['nombreColor'] . " - " . $row['refColor'] . " <span style='width:16px;height:16px;display: inline-block;background:" . $row['thumb'] . ";'> </span></li>" . "<div> "
-                                            . "<button type='button' name='editarColor' value='" . $row['idColor'] . "' class='botonEditarColores btn btn-sm btn-success' data-bs-toggle='modal' data-bs-target='#editarColorModal'>Editar</button>"
-                                            . "<button type='button' name='eliminarTipo' value='" . $row['idColor'] . "' class='botonEliminarColores btn btn-sm btn-danger'>Eliminar</button>"
-                                            . "</div></li>";
-                                    }
-                                    echo "</ul>";
+                                echo "<ul class='list-group' id='listadoColores' style='height:250px;overflow-y: scroll;margin:10px auto;'>";
+                                while ($row = mysqli_fetch_assoc($result)) {
+                                    echo "<li class='list-group-item' >" . $row['nombreColor'] . " - " . $row['refColor'] . " <span style='width:16px;height:16px;display: inline-block;background:" . $row['thumb'] . ";'> </span></li>" . "<div> "
+                                        . "<button type='button' name='editarColor' value='" . $row['idColor'] . "' class='botonEditarColores btn btn-sm btn-success' data-bs-toggle='modal' data-bs-target='#editarColorModal'>Editar</button>"
+                                        . "<button type='button' name='eliminarTipo' value='" . $row['idColor'] . "' class='botonEliminarColores btn btn-sm btn-danger'>Eliminar</button>"
+                                        . "</div></li>";
                                 }
+                                echo "</ul>";
                                 ?>
                                 <!-- Modal para editar tipo -->
                                 <div class="modal fade" id="editarColorModal" tabindex="-1" aria-labelledby="editarColorModalLabel" aria-hidden="true">
@@ -289,9 +295,11 @@ if (!$con) {
                         <div class="card">
                             <div class="card-body" id="GrupoRelacionados">
                                 <h5 class="card-title">Relaciones</h5>
+                                <div class="row align-items-center"></div>
                                 <?php
                                 echo get_relaciones();
                                 ?>
+                                </div>
                                 <a href="opciones.php" class="btn btn-primary">Añadir</a>
                             </div>
                         </div>

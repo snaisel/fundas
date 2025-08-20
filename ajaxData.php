@@ -211,6 +211,24 @@ if (isset($_POST['idMarcaEditar'])) {
     $stmt->close();
     $conn->close();
 }
+if (isset($_POST['idYearEditar'])) {
+    $idYear = $_POST['idYearEditar'];
+    $conn = getdb();
+    // Consulta SQL
+    $sql = "SELECT * FROM year WHERE idYear = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $idYear);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        echo json_encode($row);
+    } else {
+        echo json_encode(['error' => 'No se encontró el año']);
+    }
+    $stmt->close();
+    $conn->close();
+}
 if (isset($_POST['idModeloEditar'])) {
     $idModelo = $_POST['idModeloEditar'];
     $conn = getdb();
@@ -271,6 +289,11 @@ if (isset($_POST['idColorEditar'])) {
 if (isset($_POST['idMarcaEliminar'])) {
     $con = getdb();
     $query = "DELETE FROM `marca` WHERE `idMarca` = '" . $_POST["idMarcaEliminar"] . "'";
+    $result = mysqli_query($con, $query);
+}
+if (isset($_POST['idYearEliminar'])) {
+    $con = getdb();
+    $query = "DELETE FROM `year` WHERE `idYear` = '" . $_POST["idYearEliminar"] . "'";
     $result = mysqli_query($con, $query);
 }
 if (isset($_POST['idModeloEliminar'])) {
