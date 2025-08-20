@@ -13,6 +13,23 @@ if (isset($_POST['logout'])) {
 }
 require 'class.php';
 $con = getdb();
+if (!$con) {
+    echo '<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Error de conexión</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="container mt-5">
+            <div class="alert alert-danger">
+                <strong>Error:</strong> No se pudo conectar a la base de datos. Por favor, revise la configuración en <code>config.php</code> o contacte al administrador.
+            </div>
+        </div>
+    </body>
+    </html>';
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -27,45 +44,9 @@ $con = getdb();
     </head>
     <body>
         <?php require 'login.php'; ?>
-        <div class="container">
-            <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
-                <a href="index.php" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
-                    <svg class="bi me-2" width="40" height="32">
-                        <use xlink:href="index.php"></use>
-                    </svg>
-                    <span class="fs-4">Fundas Conexionred</span>
-                </a>
-
-                <ul class="nav nav-pills">
-                    <li class="nav-item">
-                        <a href="index.php" class="nav-link active" aria-current="page">Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="opciones.php" class="nav-link">Opciones</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="acciones.php" class="nav-link">Fundas</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="modelos.php" class="nav-link">Modelos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="sumar.php" class="nav-link">Sumar</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="restar.php" class="nav-link">Restar</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="admin_config.php" class="nav-link">Administrar</a>
-                    </li>
-                    <li class="nav-item">
-                        <form method="post" action="index.php" class="d-flex">
-                            <input type="hidden" name="logout" value="1">
-                            <button type="submit" class="btn btn-outline-danger">Cerrar sesión</button>
-                        </form>
-                    </li>
-                </ul>
-            </header>
+        <div
+            class="container">
+            <?php include 'header.php'; ?>
             <main>
                 <div class="row">
                     <div class="col-md-4">
