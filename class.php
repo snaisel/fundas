@@ -471,6 +471,9 @@ function get_relaciones($modelo = 0) {
             }
             $relacionados .= "</ul><button class='btn btn-danger eliminarRelacion' value='" . $row['idRel'] . "'>Eliminar <i class='bi bi-trash'></i></button></div><hr>";
         }
+        if ($relacionados == " ") {
+            $relacionados = "<div class='alert alert-warning'>No hay relaciones registradas</div>";
+        }   
 
         return $relacionados;
     }
