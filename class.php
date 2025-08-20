@@ -11,7 +11,7 @@ if (!file_exists("config.php")) {
 }
 
 function getdb() {
-$config = include("config.php");
+    $config = include("config.php");
     $servername = $config['host'];
     $username = $config['user'];
     $password = $config['pass'];
@@ -243,7 +243,19 @@ function get_modelo($modelo) {
         return $row['nombreModelo'];
     }
 }
-
+function get_marca_by_modelo($ref) {
+    $con = getdb();
+    $Sql = "SELECT refMarca FROM modelo WHERE `refMarca`=" . substr($ref, 0, 2) . " AND `refYear` = " . substr($ref, 2, 2) . " AND `refModelo`=" . substr($ref, 4, 2) . " LIMIT 1";
+    $result = mysqli_query($con, $Sql);
+    if (!$result) {
+        return false;
+    } else {
+        while ($row = mysqli_fetch_assoc($result)) {
+            $marca = $row['refMarca'];
+        }
+        return $marca;
+    }
+}
 function get_modelo_filtrado($modelo) {
     $search = array("Galaxy ", "GALAXY ", "Redmi Note ", "REDMI NOTE ", "Redmi ", "REDMI ", "Xiaomi ", "XIAOMI ", "Mi ", "MI ", "Xperia ");
     foreach ($search as $filtro) {
@@ -318,7 +330,7 @@ function get_fundas($parametro = "idStock", $orderby = "DESC", $page = 1, $limit
     $result = $query->fetch_assoc();
     $rowCount = $result['rowNum'];
     $pages = $rowCount / $limit;
-    
+
     if ($rowCount % $limit > 0)
         $pages++;
     $actualPage = $limit * ($page - 1);
@@ -342,10 +354,11 @@ function get_fundas($parametro = "idStock", $orderby = "DESC", $page = 1, $limit
         $html = "";
         $html .= "<div class='row mt-2 mb-2'><div class='col'>Filtrar por modelo <i class='bi bi-funnel'></i> " . select_model_stock($modelo);
         $html .= "</div><div class='col text-end'>Mostrando del " . $actualPage . " al " . $to . " de " . $rowCount . "</div></div>";
-        if (get_relaciones_title($modelo) && $modelo!="") {
-                    $relacionados = get_relaciones_title($modelo);
-                
-        $html .= "<div class='alert alert-sm alert-info'>Modelos relacionados: ".$relacionados."</div>"; }
+        if (get_relaciones_title($modelo) && $modelo != "") {
+            $relacionados = get_relaciones_title($modelo);
+
+            $html .= "<div class='alert alert-sm alert-info'>Modelos relacionados: " . $relacionados . "</div>";
+        }
         $html .= "<table class='table table-striped' style='width:100%;'><thead><tr><th><a href='#' class='ordenar active' id='idStock'>Codigo</a></th><th><a href='#' class='ordenar'  id='idMarca'>Marca</a></th><th><a href='#' class='ordenar'  id='refModel'>Modelo</a></th><th><a href='#' class='ordenar'  id='refTipo'>Tipo</a></th><th><a href='#' class='ordenar'  id='refColor'>Color</a></th><th>Precio</th><th>Rel</th><th><a href='#' class='ordenar'  id='stock'>Stock</a></th><th><a href='#' class='ordenar'  id='modificado'>Modificado</a></th><th>Acciones</th></tr></thead><tbody id='cuerpostock' class='" . $orderby . "'>";
         while ($row = mysqli_fetch_assoc($result)) {
             $tipo = str_pad($row['refTipo'], 2, '0', STR_PAD_LEFT);
@@ -362,8 +375,8 @@ function get_fundas($parametro = "idStock", $orderby = "DESC", $page = 1, $limit
             $html .= "<tr id=fila" . $row['idStock'] . "><td>" . $codigo . "</td><td>" . get_marca_name(substr($row['refModel'], 0, 2)) . "</td><td>" . $relacionados . "</td><td>" . get_tipo($row['refTipo']) . "</td><td>" . get_color($row['refColor']) . " <span style='width:16px;height:16px;display: inline-block;background:" . get_thumb($row['refColor']) . ";'> </span></td><td>" . get_precio($row['refTipo']) . "€</td><td>" . $usarrel . "</td><td>" . $row['stock'] . "</td><td>" . $row['modificado'] . "</td><td><button class='btn btn-info botoneditar' value='" . $row['idStock'] . "' name='editar'>Editar <i class='bi bi-pencil'></i></button> <button class='botoneliminar btn btn-danger' value='" . $row['idStock'] . "' name='eliminar'>Eliminar <i class='bi bi-trash'></i></button></td></tr>";
         }
         $html .= "</tbody></table>";
-        if ($rowCount==0){
-            $html.= " <div class='alert alert-warning'>No hay resultados para esta funda</div>";
+        if ($rowCount == 0) {
+            $html .= " <div class='alert alert-warning'>No hay resultados para esta funda</div>";
         }
         $html .= pagination($page, $pages, $actualPage, $rowCount, $to);
     }
@@ -460,20 +473,20 @@ function get_relaciones($modelo = 0) {
     } else {
         $relacionados = " ";
         while ($row = mysqli_fetch_assoc($result)) {
-            $relacionados .= "<div id='relacionados" . $row['idRel'] . "' class='eliminarRelaciones'><h6>" . $row['idRel'] . "</h6><ul class='list-group'>";
+            $relacionados .= "<div id='relacionados" . $row['idRel'] . "' class='eliminarRelaciones mb-5 col-lg-2 col-md-3 col-sm-6 '><h6>Referencia " . $row['idRel'] . "</h6><ul class='list-group'>";
             $referencias = unserialize($row['referencias']);
             if (is_array($referencias)) {
                 foreach ($referencias as $referencia) {
-                    $relacionados .= "<li class='list-group-item'>" . get_modelo($referencia) . "</li>";
+                    $relacionados .= "<li class='list-group-item'>" . get_marca_name(get_marca_by_modelo($referencia)) . " " . get_modelo($referencia) . "</li>";
                 }
             } else {
-                $relacionados .= "<li class='list-group-item'>" . get_modelo($referencias) . "</li>";
+                $relacionados .= "<li class='list-group-item'>" . get_marca_name(get_marca_by_modelo($referencias)) . " " . get_modelo($referencias) . "</li>";
             }
-            $relacionados .= "</ul><button class='btn btn-danger eliminarRelacion' value='" . $row['idRel'] . "'>Eliminar <i class='bi bi-trash'></i></button></div><hr>";
+            $relacionados .= "</ul><button class='btn btn-danger eliminarRelacion' value='" . $row['idRel'] . "'>Eliminar <i class='bi bi-trash'></i></button></div>";
         }
         if ($relacionados == " ") {
             $relacionados = "<div class='alert alert-warning'>No hay relaciones registradas</div>";
-        }   
+        }
 
         return $relacionados;
     }
@@ -582,7 +595,7 @@ function download_send_headers($filename) {
 
 function select_model_stock($modelo = "") {
     $con = getdb();
-//    $Sql = "SELECT DISTINCT `refModel` FROM `stock` ORDER BY `idMarca`, `refModel`";
+    //    $Sql = "SELECT DISTINCT `refModel` FROM `stock` ORDER BY `idMarca`, `refModel`";
 //    $result = mysqli_query($con, $Sql);
 //    if (!$result) {
 //        return false;

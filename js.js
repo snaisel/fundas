@@ -226,6 +226,27 @@ $(document).ready(function () {
       return false;
     }
   });
+  $("#listadoYear").on("click", ".botonEliminarYear", function () {
+    // Muestra el cuadro de confirmación
+    if (confirm("¿Estás seguro de que deseas eliminar este año?")) {
+      // Si el usuario confirma, realiza la solicitud AJAX
+      $.ajax({
+        type: "POST",
+        url: "ajaxData.php",
+        data: "idYearEliminar=" + $(this).val(),
+        success: function (data) {
+          // Recarga la página tras el éxito de la solicitud
+          location.reload();
+        },
+        error: function (xhr, status, error) {
+          // Muestra un mensaje de error si la solicitud falla
+          alert("Ocurrió un error al intentar eliminar el año: " + error);
+        },
+      });
+    } else {
+      return false;
+    }
+  });
 
   $("#listadoModelos").on("click", ".botonEliminarModelos", function () {
     // Muestra el cuadro de confirmación

@@ -107,6 +107,7 @@ require 'class.php';
                     <div class="col-md-4">
                         <form action="functions.php" method="post" class="needs-validation" >
                             <h4>Relacionados</h4>
+                            <p>Pulsa ctrl para elegir varios</p>
                             <div class="row">
                                 <!--                                <div class="col-sm-6">
                                 <?php
