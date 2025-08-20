@@ -15,45 +15,36 @@ $conn = getdb();
     </head>
     <body>
         <?php require 'login.php'; ?>
-        <div class="container">
-            <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
-                <a href="index.php" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
-                    <svg class="bi me-2" width="40" height="32"><use xlink:href="index.php"></use></svg>
-                    <span class="fs-4">Fundas Conexionred</span>
-                </a>
+        <div
+            class="container">
+            <?php include 'header.php'; ?>
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                <h2>Sumar Stock</h2>
+                <p>Introduce el código del modelo a sumar.</p>
+                <form action="functions.php" method="post" id="formularioSumar">
+                    <input type="text" name="textoSumar" id="textoSumar">
+                    <input type="submit" name="submitSumar" id="submitSumar" value="Sumar">
+                </form>
+                <?php
+                if (isset($_SESSION['variables']['codigo'])) {
+                    echo "<div class='alert alert-info'>" . $_SESSION['variables']['codigo'] . " ahora tiene " . $_SESSION['variables']['stock'] . "</div>";
+                }
 
-                <ul class="nav nav-pills">
-                    <li class="nav-item"><a href="index.php" class="nav-link">Inicio</a></li>
-                    <li class="nav-item"><a href="opciones.php" class="nav-link">Opciones</a></li>
-                    <li class="nav-item"><a href="acciones.php" class="nav-link">Fundas</a></li>
-                    <li class="nav-item"><a href="modelos.php" class="nav-link">Modelos</a></li>
-                    <li class="nav-item"><a href="sumar.php" class="nav-link active" aria-current="page">Sumar</a></li>
-                    <li class="nav-item"><a href="restar.php" class="nav-link">Restar</a></li>
-                </ul>
-            </header>
-
-            <form action="functions.php" method="post" id="formularioSumar">
-                <input type="text" name="textoSumar" id="textoSumar">
-                <input type="submit" name="submitSumar" id="submitSumar" value="Sumar">
-            </form>
-            <?php
-            if (isset($_SESSION['variables']['codigo'])) {
-                echo "<div class='alert alert-info'>" . $_SESSION['variables']['codigo'] . " ahora tiene " . $_SESSION['variables']['stock'] . "</div>";
-            }
-
-            $sql = "SELECT SUM(stock.stock) AS total_stock FROM stock";
-            $result = $conn->query($sql);
-            if ($result->num_rows > 0) {
-                // Obtener el resultado
-                $row = $result->fetch_assoc();
-                $total_stock = $row['total_stock'];
-                echo "El total de stock es: " . $total_stock;
-            } else {
-                echo "No se encontraron resultados.";
-            }
-            $conn->close();
-            ?>
-
+                $sql = "SELECT SUM(stock.stock) AS total_stock FROM stock";
+                $result = $conn->query($sql);
+                if ($result->num_rows > 0) {
+                    // Obtener el resultado
+                    $row = $result->fetch_assoc();
+                    $total_stock = $row['total_stock'];
+                    echo "El total de stock es: " . $total_stock;
+                } else {
+                    echo "No se encontraron resultados.";
+                }
+                $conn->close();
+                ?>
+                </div>
+            </div>
         </div>
     </body>
 </html>
