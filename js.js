@@ -204,6 +204,16 @@ $(document).ready(function () {
       },
     });
   });
+  $("#listadoYear").on("click", ".botonListadoYear", function () {
+    $.ajax({
+      type: "POST",
+      url: "ajaxData.php",
+      data: "refYearListado=" + $(this).val(),
+      success: function (data) {
+        $("#listadoModelos").html(data);
+      },
+    });
+  });
 
   $("#listadoMarcas").on("click", ".botonEliminarMarcas", function () {
     // Muestra el cuadro de confirmación

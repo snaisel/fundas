@@ -179,6 +179,41 @@ if (isset($_POST['idMarcaListado'])) {
         }
     }
 }
+if(isset($_POST['refYearListado'])){
+    $con = getdb();
+    ?>
+    <div class="card-body">
+        <h5 class="card-title">Modelos</h5>
+        <?php
+        $marcas = get_marcas_by_year($_POST['refYearListado']);
+        $sql = "SELECT * FROM `modelo`WHERE `refYear` = " . $_POST['refYearListado'] . " ORDER BY `refMarca` ASC, `nombreModelo`";
+        $result = mysqli_query($con, $sql);
+        if (!empty($result)) {
+            if (mysqli_num_rows($result) > 0) {
+                echo get_year($_POST['refYearListado']);
+                echo "<ul class='list-group' style='height:220px;overflow-y: scroll;margin:10px auto;'>";
+                $i=0;
+                while ($row = mysqli_fetch_assoc($result)) {
+                    if ($row['refMarca'] == $marcas[$i]){
+                        if ($i > 0){echo "</ul>";}
+                        $i++;
+                        echo "<ul class='list-group-item'><strong>" . get_marca_name($row['refMarca']) . "</strong>";
+                    }
+                    echo "<li class='list-group-item'>" . $row['refMarca'] . $row['refYear'] . $row['refModelo'] . " - " . $row['nombreModelo'];
+                    echo "<div><button type=button name='editarModelo' value=" . $row['idModelo'] . " class='botonEditarModelos btn btn-sm btn-success'>Editar</button>";
+                    echo "<button type=button name='eliminarMarca' value=" . $row['idModelo'] . " class='botonEliminarModelos btn btn-sm btn-danger'>Eliminar</button>";
+                    echo "<div></li>";
+                }
+                echo "</ul>";
+                ?>
+                <a href="opciones.php" class="btn btn-primary">Añadir</a>
+            </div>
+            <?php
+        } else {
+            echo "No hay modelos de este año";
+        }
+    }
+}
 if (isset($_POST['parametro'])) {
     if (isset($_POST['model']) && $_POST['model'] != "" && !isset($_POST['page'])) {
         echo get_fundas($_POST['parametro'], $_POST['ascdesc'], 1, 20, $_POST['model']);

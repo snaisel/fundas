@@ -51,7 +51,6 @@ function select_marcas($marca = false) {
 
 function get_marca_id($ref) {
     $con = getdb();
-    $retuntext = "";
     $Sql = "SELECT * FROM marca WHERE `refMarca` = " . $ref;
     $result = mysqli_query($con, $Sql);
     if (!$result) {
@@ -65,7 +64,6 @@ function get_marca_id($ref) {
 
 function get_marca_name($ref) {
     $con = getdb();
-    $retuntext = "";
     $Sql = "SELECT * FROM marca WHERE `refMarca` = " . $ref;
     $result = mysqli_query($con, $Sql);
     if (!$result) {
@@ -79,7 +77,6 @@ function get_marca_name($ref) {
 
 function get_marca_name_by_id($id) {
     $con = getdb();
-    $retuntext = "";
     $Sql = "SELECT * FROM marca WHERE `idMarca` = " . $id;
     $result = mysqli_query($con, $Sql);
     if (!$result) {
@@ -90,7 +87,20 @@ function get_marca_name_by_id($id) {
         }
     }
 }
-
+function get_marcas_by_year($ref){
+    $con = getdb();
+    $Sql = "SELECT * FROM modelo WHERE `refYear` = " . $ref . " GROUP BY refMarca";
+    $result = mysqli_query($con, $Sql);
+    if (!$result) {
+        return false;
+    } else {
+        $marcas = array();
+        while ($row = mysqli_fetch_assoc($result)) {
+            $marcas[] = $row['refMarca'];
+        }
+        return array_unique($marcas);
+    }
+}
 function select_year($year = 0) {
     $con = getdb();
     $retuntext = "";
@@ -111,6 +121,30 @@ function select_year($year = 0) {
     }
     mysqli_close($con);
     return $retuntext;
+}
+function get_year($ref) {
+    $con = getdb();
+    $Sql = "SELECT * FROM year WHERE `refYear` = " . $ref;
+    $result = mysqli_query($con, $Sql);
+    if (!$result) {
+        return false;
+    } else {
+        while ($row = mysqli_fetch_assoc($result)) {
+            return $row['year'];
+        }
+    }
+}
+function get_year_by_id($id) {
+    $con = getdb();
+    $Sql = "SELECT * FROM year WHERE `idYear` = " . $id;
+    $result = mysqli_query($con, $Sql);
+    if (!$result) {
+        return false;
+    } else {
+        while ($row = mysqli_fetch_assoc($result)) {
+            return $row['year'];
+        }
+    }
 }
 
 function select_modelos($modelo = false) {
