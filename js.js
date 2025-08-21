@@ -194,27 +194,85 @@ $(document).ready(function () {
       }
     }
   );
+  let marcaref = null;
+  let yearref = null;
+  let removeFilter = false;
   $("#listadoMarcas").on("click", ".botonListadoMarcas", function () {
+    marcaref = $(this).val();
     $.ajax({
       type: "POST",
       url: "ajaxData.php",
-      data: "idMarcaListado=" + $(this).val(),
+      data: "idMarcaListado=" + marcaref,
       success: function (data) {
         $("#listadoModelos").html(data);
       },
     });
+    filterByMarcaYear();
   });
   $("#listadoYear").on("click", ".botonListadoYear", function () {
+    yearref = $(this).val();
     $.ajax({
       type: "POST",
       url: "ajaxData.php",
-      data: "refYearListado=" + $(this).val(),
+      data: "refYearListado=" + yearref,
       success: function (data) {
         $("#listadoModelos").html(data);
       },
     });
+    filterByMarcaYear();
   });
-
+  $("#listadoModelos").on("click", ".modeloFilter", function () {
+    removeFilter = true;
+    if ($(this).attr("id") === "yearFilter") {
+      yearref = null;
+      console.log("yearref is null");
+    } else if ($(this).attr("id") === "marcaFilter") {
+      marcaref = null;
+      console.log("marcaref is null");
+    }
+    filterByMarcaYear();
+  });
+  function filterByMarcaYear() {
+    if (marcaref && yearref) {
+      $.post(
+        "ajaxData.php",
+        { refMarcaFilter: marcaref, refYearFilter: yearref },
+        function (data) {
+          $("#listadoModelos").html(data);
+        }
+      );
+    }
+    else if (yearref && !marcaref && removeFilter) {
+      removeFilter = false;
+      $.post(
+        "ajaxData.php",
+        { refYearListado: yearref },
+        function (data) {
+          $("#listadoModelos").html(data);
+        }
+      );
+    }
+    else if (marcaref && !yearref && removeFilter) {
+      removeFilter = false;
+      $.post(
+        "ajaxData.php",
+        { idMarcaListado: marcaref },
+        function (data) {
+          $("#listadoModelos").html(data);
+        }
+      );
+    }
+    else if (!marcaref && !yearref && removeFilter) {
+      removeFilter = false;
+      $.post(
+        "ajaxData.php",
+        { noFilters: true},
+        function (data) {
+          $("#listadoModelos").html(data);
+        }
+      );
+    }
+  }
   $("#listadoMarcas").on("click", ".botonEliminarMarcas", function () {
     // Muestra el cuadro de confirmación
     if (confirm("¿Estás seguro de que deseas eliminar esta marca?")) {

@@ -60,11 +60,12 @@ if (!empty($_POST["keyword"])) {
     if (!empty($result)) {
         if (mysqli_num_rows($result) > 0) {
             ?>
-            <div id="model-list" class="list-group">
+            <div
+                id="model-list" class="list-group">
                 <?php
                 foreach ($result as $row) {
                     ?>
-                    <a href="#" class="list-group-item list-group-item-action" onClick="selectModel('<?php echo $row["nombreModelo"]; ?>');"><?php echo $row["nombreModelo"]; ?></a>
+                    <a href="#" class="list-group-item list-group-item-action" onclick="selectModel('<?php echo $row["nombreModelo"]; ?>');"><?php echo $row["nombreModelo"]; ?></a>
                 <?php } ?>
             </div>
             <?php
@@ -102,21 +103,22 @@ if (!empty($_POST["idStockEditar"])) {
                 <div class="card-body">
                     <div class="row">
                         <div class="form-group col-sm-3">
-                            <input type="hidden" value="<?php echo $_POST["idStockEditar"]; ?>" name="idStock">
-                            <?php
-                            echo "Marcas" . select_marcas(substr($row['refModel'], 0, 2));
-                            echo "Año" . select_year(substr($row['refModel'], 2, 2));
-                            echo "Modelo";
-                            echo select_modelos($row['refModel']);
-                            ?>
+                            <input
+                            type="hidden" value="<?php echo $_POST["idStockEditar"]; ?>" name="idStock">
+                        <?php
+                        echo "Marcas" . select_marcas(substr($row['refModel'], 0, 2));
+                        echo "Año" . select_year(substr($row['refModel'], 2, 2));
+                        echo "Modelo";
+                        echo select_modelos($row['refModel']);
+                        ?>
                         </div>
-                        <div class="form-group col-sm-3">
-                            <?php
+                        <div
+                            class="form-group col-sm-3"><?php
                             echo "Tipo" . select_tipo($row['refTipo']);
                             ?>
                         </div>
-                        <div class="form-group col-sm-3">
-                            <?php
+                        <div
+                            class="form-group col-sm-3"><?php
                             echo "Color" . select_color($row['refColor']);
                             ?>
                         </div>
@@ -127,13 +129,16 @@ if (!empty($_POST["idStockEditar"])) {
                             ?>
                             Relacionados
                             <div id="relacionados">
-                                <input type="radio" id="si" value="1" name="usarrel"<?php if ($row['usarRel'] == 1) echo " checked"; ?>><label for="si">Si</label>
-                                <input type="radio" id="no" value="0" name="usarrel"<?php if ($row['usarRel'] == 0) echo " checked"; ?>><label for="no">No</label>
+                                <input type="radio" id="si" value="1" name="usarrel" <?php if ($row['usarRel'] == 1)
+                                    echo " checked"; ?>><label for="si">Si</label>
+                                <input type="radio" id="no" value="0" name="usarrel" <?php if ($row['usarRel'] == 0)
+                                    echo " checked"; ?>><label for="no">No</label>
                             </div>
                             <button class="btn btn-primary" type="submit" id="enviarStock">Enviar</button>
                         </div>
                     </div>
-                </div> <?php
+                </div>
+                <?php
             }
         } else {
             echo 'No hay resultados. Comprueba el Codigo introducido';
@@ -161,7 +166,7 @@ if (isset($_POST['idMarcaListado'])) {
         $result = mysqli_query($con, $sql);
         if (!empty($result)) {
             if (mysqli_num_rows($result) > 0) {
-                echo get_marca_name($_POST['idMarcaListado']);
+                echo "<button class='badge bg-secondary modeloFilter' id='marcaFilter' value='" . $_POST['idMarcaListado'] . "'>" . get_marca_name($_POST['idMarcaListado']) . "</button>";
                 echo "<ul class='list-group' style='height:220px;overflow-y: scroll;margin:10px auto;'>";
                 while ($row = mysqli_fetch_assoc($result)) {
                     echo "<li class='list-group-item'>" . $row['refMarca'] . $row['refYear'] . $row['refModelo'] . " - " . $row['nombreModelo'];
@@ -174,12 +179,13 @@ if (isset($_POST['idMarcaListado'])) {
                 <a href="opciones.php" class="btn btn-primary">Añadir</a>
             </div>
             <?php
-        } else {
-            echo "No hay modelos de esta marca";
+            } else {
+                echo "<button class='badge bg-secondary modeloFilter' id='marcaFilter' value='" . $_POST['idMarcaListado'] . "'>" . get_marca_name($_POST['idMarcaListado']) . "</button>";
+                echo "No hay modelos de esta marca";
+            }
         }
-    }
 }
-if(isset($_POST['refYearListado'])){
+if (isset($_POST['refYearListado'])) {
     $con = getdb();
     ?>
     <div class="card-body">
@@ -190,12 +196,14 @@ if(isset($_POST['refYearListado'])){
         $result = mysqli_query($con, $sql);
         if (!empty($result)) {
             if (mysqli_num_rows($result) > 0) {
-                echo get_year($_POST['refYearListado']);
+                echo "<button class='badge bg-secondary modeloFilter' id='yearFilter' value='" . $_POST['refYearListado'] . "'>" . get_year($_POST['refYearListado']) . "</button>";
                 echo "<ul class='list-group' style='height:220px;overflow-y: scroll;margin:10px auto;'>";
-                $i=0;
+                $i = 0;
                 while ($row = mysqli_fetch_assoc($result)) {
-                    if ($row['refMarca'] == $marcas[$i]){
-                        if ($i > 0){echo "</ul>";}
+                    if ($row['refMarca'] == $marcas[$i]) {
+                        if ($i > 0) {
+                            echo "</ul>";
+                        }
                         $i++;
                         echo "<ul class='list-group-item'><strong>" . get_marca_name($row['refMarca']) . "</strong>";
                     }
@@ -209,10 +217,49 @@ if(isset($_POST['refYearListado'])){
                 <a href="opciones.php" class="btn btn-primary">Añadir</a>
             </div>
             <?php
-        } else {
-            echo "No hay modelos de este año";
+            } else {
+                echo "<button class='badge bg-secondary modeloFilter' id='yearFilter' value='" . $_POST['refYearListado'] . "'>" . get_year($_POST['refYearListado']) . "</button>";
+                echo "No hay modelos de este año";
+            }
         }
-    }
+}
+if (isset($_POST['refMarcaFilter']) && isset($_POST['refYearFilter'])) {
+    $con = getdb();
+    ?>
+    <div class="card-body">
+        <h5 class="card-title">Modelos</h5>
+        <?php
+        $sql = "SELECT * FROM `modelo`WHERE `refYear` = " . $_POST['refYearFilter'] . " AND `refMarca` = " . $_POST['refMarcaFilter'] . " ORDER BY `refMarca` ASC, `nombreModelo`";
+        $result = mysqli_query($con, $sql);
+        if (!empty($result)) {
+            if (mysqli_num_rows($result) > 0) {
+                echo "<button class='badge bg-secondary modeloFilter' id='marcaFilter' value='" . $_POST['refMarcaFilter'] . "'>" . get_marca_name($_POST['refMarcaFilter']) . "</button><button class='badge bg-secondary modeloFilter' id='yearFilter' value='" . $_POST['refYearFilter'] . "'>" . get_year($_POST['refYearFilter']) . "</button>";
+                echo "<ul class='list-group' style='height:220px;overflow-y: scroll;margin:10px auto;'>";
+                while ($row = mysqli_fetch_assoc($result)) {
+                    echo "<li class='list-group-item'>" . $row['refMarca'] . $row['refYear'] . $row['refModelo'] . " - " . $row['nombreModelo'];
+                    echo "<div><button type=button name='editarModelo' value=" . $row['idModelo'] . " class='botonEditarModelos btn btn-sm btn-success'>Editar</button>";
+                    echo "<button type=button name='eliminarMarca' value=" . $row['idModelo'] . " class='botonEliminarModelos btn btn-sm btn-danger'>Eliminar</button>";
+                    echo "<div></li>";
+                }
+                echo "</ul>";
+                ?>
+                <a href="opciones.php" class="btn btn-primary">Añadir</a>
+            </div>
+            <?php
+            } else {
+                echo "<button class='badge bg-secondary modeloFilter' id='marcaFilter' value='" . $_POST['refMarcaFilter'] . "'>" . get_marca_name($_POST['refMarcaFilter']) . "</button><button class='badge bg-secondary modeloFilter' id='yearFilter' value='" . $_POST['refYearFilter'] . "'>" . get_year($_POST['refYearFilter']) . "</button>";
+                echo "No hay modelos de este año";
+            }
+        }
+}
+if (isset($_POST['noFilters'])) {
+    echo "<div class='card-body'>";
+    echo "<h5 class='card-title'>Modelos</h5>";
+    echo get_modelos();
+    echo "</div>";
+    echo "<div class='card-footer'>";
+    echo "<a href='opciones.php' class='btn btn-primary'>Añadir</a>";
+    echo "</div>";
 }
 if (isset($_POST['parametro'])) {
     if (isset($_POST['model']) && $_POST['model'] != "" && !isset($_POST['page'])) {

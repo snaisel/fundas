@@ -87,7 +87,7 @@ function get_marca_name_by_id($id) {
         }
     }
 }
-function get_marcas_by_year($ref){
+function get_marcas_by_year($ref) {
     $con = getdb();
     $Sql = "SELECT * FROM modelo WHERE `refYear` = " . $ref . " GROUP BY refMarca";
     $result = mysqli_query($con, $Sql);
@@ -301,10 +301,30 @@ function get_modelo_filtrado($modelo) {
         }
     }
 }
-
+function get_modelos() {
+    $con = getdb();
+    $marca = "";
+    $sql = "SELECT * FROM `modelo` ORDER BY `refMarca` ASC, `refYear` DESC, `nombreModelo`";
+    $result = mysqli_query($con, $sql);
+    if (mysqli_num_rows($result) == 0) {
+        echo "<div class='alert alert-warning'>No hay modelos disponibles</div>";
+    } else {
+        echo "<ul class='list-group' style='height:250px;overflow-y: scroll;margin:10px auto;'><li><ul>";
+        while ($row = mysqli_fetch_assoc($result)) {
+            if ($marca != $row['refMarca']) {
+                $marca = $row['refMarca'];
+                echo "</ul></li><li class='list-group-item'>" . get_marca_name($marca) . "<ul class='list-group'>";
+            }
+            echo "<li class='list-group-item'>" . $row['refMarca'] . $row['refYear'] . $row['refModelo'] . " - " . $row['nombreModelo'];
+            echo "<div><button type=button name='editarModelo' value=" . $row['idModelo'] . " class='botonEditarModelos btn btn-sm btn-success'>Editar</button>";
+            echo "<button type=button name='eliminarMarca' value=" . $row['idModelo'] . " class='botonEliminarModelos btn btn-sm btn-danger'>Eliminar</button>";
+            echo "<div></li>";
+        }
+        echo "</ul>";
+    }
+}
 function get_color($ref) {
     $con = getdb();
-    $retuntext = "";
     $Sql = "SELECT * FROM color WHERE `refColor` = " . $ref;
     $result = mysqli_query($con, $Sql);
     if (!$result) {
@@ -318,7 +338,6 @@ function get_color($ref) {
 
 function get_thumb($ref) {
     $con = getdb();
-    $retuntext = "";
     $Sql = "SELECT * FROM color WHERE `refColor` = " . $ref;
     $result = mysqli_query($con, $Sql);
     if (!$result) {

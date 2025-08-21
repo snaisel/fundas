@@ -52,20 +52,21 @@ if (!$con) {
                     <div class="col-md-4">
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title">Marcas
+                                <div class="card-title">
+                                    <h5 class="card-title">Marcas</h5>
                                     <span class="badge bg-secondary">Pulsa en la marca para filtrar el modelo</span>
-                                </h5>
+                                </div>
                                 <?php
                                 $sql = "SELECT * FROM `marca` ORDER BY refMarca";
                                 $result = mysqli_query($con, $sql);
-                                 if (mysqli_num_rows($result) == 0) {
+                                if (mysqli_num_rows($result) == 0) {
                                     echo "<div class='alert alert-warning'>No hay marcas disponibles</div>";
                                 } else {
-                                        echo "<div id='listadoMarcas' class='list-group' style='height:250px;overflow-y: scroll;margin:10px auto;'>";
-                                        while ($row = mysqli_fetch_assoc($result)) {
-                                            echo "<li class='list-group-item list-group-item-action'>";
-                                            echo "<button type=button value=" . $row['refMarca'] . " class=' btn btn-secondary botonListadoMarcas'>" . $row['refMarca'] . " - " . $row['nombreMarca'] . "</button>";
-                                            echo "<button type=button name='editarMarca' value=" . $row['idMarca'] . " class='botonEditarMarcas btn btn-success'>Editar</button>";
+                                    echo "<div id='listadoMarcas' class='list-group' style='height:250px;overflow-y: scroll;margin:10px auto;'>";
+                                    while ($row = mysqli_fetch_assoc($result)) {
+                                        echo "<li class='list-group-item list-group-item-action'>";
+                                        echo "<button type=button value=" . $row['refMarca'] . " class=' btn btn-secondary botonListadoMarcas'>" . $row['refMarca'] . " - " . $row['nombreMarca'] . "</button>";
+                                        echo "<button type=button name='editarMarca' value=" . $row['idMarca'] . " class='botonEditarMarcas btn btn-success'>Editar</button>";
                                         echo "<button type=button name='eliminarMarca' value=" . $row['idMarca'] . " class='botonEliminarMarcas btn btn-danger'>Eliminar</button>";
                                         echo "</li>";
                                     }
@@ -106,21 +107,24 @@ if (!$con) {
                     <div class="col-md-4">
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title">Años</h5>
+                                <div class="card-title">
+                                    <h5 class="card-title">Años</h5>
+                                    <span class="badge bg-secondary">Pulsa en la marca para filtrar el modelo</span>
+                                </div>
                                 <?php
-                                $sql = "SELECT * FROM `year`";
+                                $sql = "SELECT * FROM `year` ORDER BY year DESC";
                                 $result = mysqli_query($con, $sql);
-                               if (mysqli_num_rows($result) == 0) {
+                                if (mysqli_num_rows($result) == 0) {
                                     echo "<div class='alert alert-warning'>No hay años disponibles</div>";
                                 } else {
-                                echo "<div id='listadoYear' class='list-group' style='height:250px;overflow-y: scroll;margin:10px auto;'>";
-                                     while ($row = mysqli_fetch_assoc($result)) {
-                                    echo "<li class='list-group-item list-group-item-action'>";
-                                    echo "<button type=button value=" . $row['refYear'] . " class='btn btn-secondary botonListadoYear'>" . $row['refYear'] . " - " . $row['year'] . "</button>";
-                                    echo "<button type=button name='editarYear' value=" . $row['idYear'] . " class='botonEditarYear btn btn-success'>Editar</button>";
-                                    echo "<button type=button name='eliminarYear' value=" . $row['idYear'] . " class='botonEliminarYear btn btn-danger'>Eliminar</button>";
-                                    echo "</li>";
-                                }
+                                    echo "<div id='listadoYear' class='list-group' style='height:250px;overflow-y: scroll;margin:10px auto;'>";
+                                    while ($row = mysqli_fetch_assoc($result)) {
+                                        echo "<li class='list-group-item list-group-item-action'>";
+                                        echo "<button type=button value=" . $row['refYear'] . " class='btn btn-secondary botonListadoYear'>" . $row['refYear'] . " - " . $row['year'] . "</button>";
+                                        echo "<button type=button name='editarYear' value=" . $row['idYear'] . " class='botonEditarYear btn btn-success'>Editar</button>";
+                                        echo "<button type=button name='eliminarYear' value=" . $row['idYear'] . " class='botonEliminarYear btn btn-danger'>Eliminar</button>";
+                                        echo "</li>";
+                                    }
                                     echo "</div>";
                                 }
                                 ?>
@@ -159,25 +163,7 @@ if (!$con) {
                             <div class="card-body">
                                 <h5 class="card-title">Modelos</h5>
                                 <?php
-                                $marca = "";
-                                $sql = "SELECT * FROM `modelo` ORDER BY `refMarca` ASC, `refYear` DESC, `nombreModelo`";
-                                $result = mysqli_query($con, $sql);
-                               if (mysqli_num_rows($result) == 0) {
-                                    echo "<div class='alert alert-warning'>No hay modelos disponibles</div>";
-                                } else {
-                                    echo "<ul class='list-group' style='height:250px;overflow-y: scroll;margin:10px auto;'><li><ul>";
-                                    while ($row = mysqli_fetch_assoc($result)) {
-                                        if ($marca != $row['refMarca']) {
-                                            $marca = $row['refMarca'];
-                                            echo "</ul></li><li class='list-group-item'>" . get_marca_name($marca) . "<ul class='list-group'>";
-                                        }
-                                        echo "<li class='list-group-item'>" . $row['refMarca'] . $row['refYear'] . $row['refModelo'] . " - " . $row['nombreModelo'];
-                                        echo "<div><button type=button name='editarModelo' value=" . $row['idModelo'] . " class='botonEditarModelos btn btn-sm btn-success'>Editar</button>";
-                                        echo "<button type=button name='eliminarMarca' value=" . $row['idModelo'] . " class='botonEliminarModelos btn btn-sm btn-danger'>Eliminar</button>";
-                                        echo "<div></li>";
-                                    }
-                                    echo "</ul>";
-                                }
+                                get_modelos();
                                 ?>
 
                             </div>
@@ -217,7 +203,7 @@ if (!$con) {
                                 <?php
                                 $sql = "SELECT * FROM `tipo`";
                                 $result = mysqli_query($con, $sql);
-                               if (mysqli_num_rows($result) == 0) {
+                                if (mysqli_num_rows($result) == 0) {
                                     echo "<span class='alert alert-warning'>No hay tipos disponibles</span>";
                                 } else {
                                     echo "<ul class='list-group' id='listadoTipos' style='height:250px;overflow-y: scroll;margin:10px auto;'>";
@@ -269,7 +255,7 @@ if (!$con) {
                                 <?php
                                 $sql = "SELECT * FROM `color`";
                                 $result = mysqli_query($con, $sql);
-                                 if (mysqli_num_rows($result) == 0) {
+                                if (mysqli_num_rows($result) == 0) {
                                     echo "<span class='alert alert-warning'>No hay colores disponibles</span>";
                                 } else {
                                     echo "<ul class='list-group' id='listadoColores' style='height:250px;overflow-y: scroll;margin:10px auto;'>";
@@ -316,10 +302,10 @@ if (!$con) {
                         <div class="card">
                             <div class="card-body" id="GrupoRelacionados">
                                 <h5 class="card-title">Relaciones</h5>
-                                <div class="row align-items-center">
-                                <?php
-                                echo get_relaciones();
-                                ?>
+                                <div
+                                    class="row align-items-center"><?php
+                                    echo get_relaciones();
+                                    ?>
                                 </div>
                                 <a href="opciones.php" class="btn btn-primary">Añadir</a>
                             </div>
