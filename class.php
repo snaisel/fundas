@@ -301,23 +301,39 @@ function get_modelo_filtrado($modelo) {
         }
     }
 }
-function get_modelos() {
+function get_modelos($refMarca = null, $refYear = null) {
     $con = getdb();
     $marca = "";
-    $sql = "SELECT * FROM `modelo` ORDER BY `refMarca` ASC, `refYear` DESC, `nombreModelo`";
+    $sql = "SELECT * FROM `modelo`";
+    if ($refMarca && !$refYear) {
+        $sql .= " WHERE `refMarca` = '$refMarca'";
+    }
+    else if ($refYear && !$refMarca) {
+        $sql .= " WHERE `refYear` = '$refYear'";
+    }
+    else if ($refYear && $refMarca) {
+        $sql .= " WHERE `refMarca` = '$refMarca' AND `refYear` = '$refYear'";
+    }
+    $sql .= " ORDER BY `refMarca` ASC, `refYear` DESC, `nombreModelo`";
     $result = mysqli_query($con, $sql);
     if (mysqli_num_rows($result) == 0) {
         echo "<div class='alert alert-warning'>No hay modelos disponibles</div>";
     } else {
+        if ($refMarca) {
+            echo "<button class='badge bg-secondary modeloFilter' id='marcaFilter' value='" . $refMarca . "'>" . get_marca_name($refMarca) . "</button>";
+        }
+        if ($refYear) {
+            echo "<button class='badge bg-secondary modeloFilter' id='yearFilter' value='" . $refYear . "'>" . get_year($refYear) . "</button>";
+        }
         echo "<ul class='list-group' style='height:250px;overflow-y: scroll;margin:10px auto;'><li><ul>";
         while ($row = mysqli_fetch_assoc($result)) {
             if ($marca != $row['refMarca']) {
                 $marca = $row['refMarca'];
-                echo "</ul></li><li class='list-group-item'>" . get_marca_name($marca) . "<ul class='list-group'>";
+                echo "</ul></li><li class='list-group-item'><h5>" . get_marca_name($marca) . "</h5><ul class='list-group'>";
             }
             echo "<li class='list-group-item'>" . $row['refMarca'] . $row['refYear'] . $row['refModelo'] . " - " . $row['nombreModelo'];
             echo "<div><button type=button name='editarModelo' value=" . $row['idModelo'] . " class='botonEditarModelos btn btn-sm btn-success'>Editar</button>";
-            echo "<button type=button name='eliminarMarca' value=" . $row['idModelo'] . " class='botonEliminarModelos btn btn-sm btn-danger'>Eliminar</button>";
+            echo "<button type=button name='eliminarModelo' value=" . $row['idModelo'] . " class='botonEliminarModelos btn btn-sm btn-danger'>Eliminar</button>";
             echo "<div></li>";
         }
         echo "</ul>";

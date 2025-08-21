@@ -156,101 +156,38 @@ if (isset($_POST['idRelEditar'])) {
     }
 }
 if (isset($_POST['idMarcaListado'])) {
-    $con = getdb();
     ?>
     <div class="card-body">
         <h5 class="card-title">Modelos</h5>
         <?php
-        $marca = "";
-        $sql = "SELECT * FROM `modelo`WHERE `refMarca` = " . $_POST['idMarcaListado'] . " ORDER BY `refYear` DESC, `nombreModelo`";
-        $result = mysqli_query($con, $sql);
-        if (!empty($result)) {
-            if (mysqli_num_rows($result) > 0) {
-                echo "<button class='badge bg-secondary modeloFilter' id='marcaFilter' value='" . $_POST['idMarcaListado'] . "'>" . get_marca_name($_POST['idMarcaListado']) . "</button>";
-                echo "<ul class='list-group' style='height:220px;overflow-y: scroll;margin:10px auto;'>";
-                while ($row = mysqli_fetch_assoc($result)) {
-                    echo "<li class='list-group-item'>" . $row['refMarca'] . $row['refYear'] . $row['refModelo'] . " - " . $row['nombreModelo'];
-                    echo "<div><button type=button name='editarModelo' value=" . $row['idModelo'] . " class='botonEditarModelos btn btn-sm btn-success'>Editar</button>";
-                    echo "<button type=button name='eliminarMarca' value=" . $row['idModelo'] . " class='botonEliminarModelos btn btn-sm btn-danger'>Eliminar</button>";
-                    echo "<div></li>";
-                }
-                echo "</ul>";
-                ?>
-                <a href="opciones.php" class="btn btn-primary">Añadir</a>
-            </div>
-            <?php
-            } else {
-                echo "<button class='badge bg-secondary modeloFilter' id='marcaFilter' value='" . $_POST['idMarcaListado'] . "'>" . get_marca_name($_POST['idMarcaListado']) . "</button>";
-                echo "No hay modelos de esta marca";
-            }
-        }
+        get_modelos($_POST['idMarcaListado']);
+        ?>
+        <a href="opciones.php" class="btn btn-primary">Añadir</a>
+    </div>
+    <?php
 }
 if (isset($_POST['refYearListado'])) {
-    $con = getdb();
     ?>
     <div class="card-body">
         <h5 class="card-title">Modelos</h5>
         <?php
-        $marcas = get_marcas_by_year($_POST['refYearListado']);
-        $sql = "SELECT * FROM `modelo`WHERE `refYear` = " . $_POST['refYearListado'] . " ORDER BY `refMarca` ASC, `nombreModelo`";
-        $result = mysqli_query($con, $sql);
-        if (!empty($result)) {
-            if (mysqli_num_rows($result) > 0) {
-                echo "<button class='badge bg-secondary modeloFilter' id='yearFilter' value='" . $_POST['refYearListado'] . "'>" . get_year($_POST['refYearListado']) . "</button>";
-                echo "<ul class='list-group' style='height:220px;overflow-y: scroll;margin:10px auto;'>";
-                $i = 0;
-                while ($row = mysqli_fetch_assoc($result)) {
-                    if ($row['refMarca'] == $marcas[$i]) {
-                        if ($i > 0) {
-                            echo "</ul>";
-                        }
-                        $i++;
-                        echo "<ul class='list-group-item'><strong>" . get_marca_name($row['refMarca']) . "</strong>";
-                    }
-                    echo "<li class='list-group-item'>" . $row['refMarca'] . $row['refYear'] . $row['refModelo'] . " - " . $row['nombreModelo'];
-                    echo "<div><button type=button name='editarModelo' value=" . $row['idModelo'] . " class='botonEditarModelos btn btn-sm btn-success'>Editar</button>";
-                    echo "<button type=button name='eliminarMarca' value=" . $row['idModelo'] . " class='botonEliminarModelos btn btn-sm btn-danger'>Eliminar</button>";
-                    echo "<div></li>";
-                }
-                echo "</ul>";
-                ?>
-                <a href="opciones.php" class="btn btn-primary">Añadir</a>
-            </div>
-            <?php
-            } else {
-                echo "<button class='badge bg-secondary modeloFilter' id='yearFilter' value='" . $_POST['refYearListado'] . "'>" . get_year($_POST['refYearListado']) . "</button>";
-                echo "No hay modelos de este año";
-            }
-        }
+        get_modelos(null, $_POST['refYearListado']);
+        ?>
+        <a href="opciones.php" class="btn btn-primary">Añadir</a>
+    </div>
+    <?php
 }
 if (isset($_POST['refMarcaFilter']) && isset($_POST['refYearFilter'])) {
-    $con = getdb();
     ?>
     <div class="card-body">
         <h5 class="card-title">Modelos</h5>
         <?php
-        $sql = "SELECT * FROM `modelo`WHERE `refYear` = " . $_POST['refYearFilter'] . " AND `refMarca` = " . $_POST['refMarcaFilter'] . " ORDER BY `refMarca` ASC, `nombreModelo`";
-        $result = mysqli_query($con, $sql);
-        if (!empty($result)) {
-            if (mysqli_num_rows($result) > 0) {
-                echo "<button class='badge bg-secondary modeloFilter' id='marcaFilter' value='" . $_POST['refMarcaFilter'] . "'>" . get_marca_name($_POST['refMarcaFilter']) . "</button><button class='badge bg-secondary modeloFilter' id='yearFilter' value='" . $_POST['refYearFilter'] . "'>" . get_year($_POST['refYearFilter']) . "</button>";
-                echo "<ul class='list-group' style='height:220px;overflow-y: scroll;margin:10px auto;'>";
-                while ($row = mysqli_fetch_assoc($result)) {
-                    echo "<li class='list-group-item'>" . $row['refMarca'] . $row['refYear'] . $row['refModelo'] . " - " . $row['nombreModelo'];
-                    echo "<div><button type=button name='editarModelo' value=" . $row['idModelo'] . " class='botonEditarModelos btn btn-sm btn-success'>Editar</button>";
-                    echo "<button type=button name='eliminarMarca' value=" . $row['idModelo'] . " class='botonEliminarModelos btn btn-sm btn-danger'>Eliminar</button>";
-                    echo "<div></li>";
-                }
-                echo "</ul>";
-                ?>
-                <a href="opciones.php" class="btn btn-primary">Añadir</a>
-            </div>
-            <?php
-            } else {
-                echo "<button class='badge bg-secondary modeloFilter' id='marcaFilter' value='" . $_POST['refMarcaFilter'] . "'>" . get_marca_name($_POST['refMarcaFilter']) . "</button><button class='badge bg-secondary modeloFilter' id='yearFilter' value='" . $_POST['refYearFilter'] . "'>" . get_year($_POST['refYearFilter']) . "</button>";
-                echo "No hay modelos de este año";
-            }
-        }
+        get_modelos($_POST['refMarcaFilter'], $_POST['refYearFilter']);
+        ?>
+        <a href="opciones.php" class="btn btn-primary">Añadir</a>
+    </div>
+    <?php
+
 }
 if (isset($_POST['noFilters'])) {
     echo "<div class='card-body'>";
