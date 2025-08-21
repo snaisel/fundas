@@ -18,14 +18,20 @@ include_once 'Pagination.php';
     </head>
     <body>
         <?php require 'login.php'; ?>
-        <div class="container">
+        <div
+            class="container">
             <?php include 'header.php'; ?>
-            <main>
+            <div class="text-center" id="cargando">
+                <div class="spinner-border text-info" role="status" style="width: 3rem; height: 3rem;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            <main class="d-none" id="mainContent">
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">Crear o Modificar funda</h3>
                     </div>
-                    <form action="functions.php" method="post" class="needs-validation" id="formularioStock" >
+                    <form action="functions.php" method="post" class="needs-validation" id="formularioStock">
                         <div class="card-body">
                             <div class="row">
                                 <div class="form-group col-sm-4">
@@ -44,20 +50,18 @@ include_once 'Pagination.php';
                                         echo select_modelos($_SESSION['variables']['modelo']);
                                     } else {
                                         ?>
-                                        <select name="modelos" class='form-select' id="modelos">
-                                            <option value ="">Selecciona primero la marca</option>
+                                            <select name="modelos" class='form-select' id="modelos"> <option value="">Selecciona primero la marca</option>
 
                                         </select>
                                     <?php } ?>
                                 </div>
-                                <div class="form-group col-sm-4">
-                                    <?php
-                                    if (isset($_SESSION['variables']['tipo'])) {
-                                        echo "Tipo" . select_tipo($_SESSION['variables']['tipo']);
-                                    } else {
-                                        echo "Tipo" . select_tipo();
-                                    }
-                                    ?>
+                                <div class="form-group col-sm-4"><?php
+                                if (isset($_SESSION['variables']['tipo'])) {
+                                    echo "Tipo" . select_tipo($_SESSION['variables']['tipo']);
+                                } else {
+                                    echo "Tipo" . select_tipo();
+                                }
+                                ?>
                                     <?php
                                     if (isset($_SESSION['variables']['color'])) {
                                         echo "Color" . select_color($_SESSION['variables']['color']);
@@ -73,9 +77,7 @@ include_once 'Pagination.php';
                                         echo '<div id="stock"><input type="number" name="stock" value="' . $_SESSION['variables']['stock'] . '" required></div>';
                                     } else {
                                         ?>
-                                        <div id="stock">
-
-                                        </div>
+                                        <div id="stock"></div>
                                     <?php } ?>
                                     Relacionados
                                     <div id="relacionados">
@@ -86,19 +88,24 @@ include_once 'Pagination.php';
                                 </div>
                             </div>
                         </div>
-                    </form> 
+                    </form>
                 </div>
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">Comprobar funda</h3>
                     </div>
                     <div class="card-body" id="comprobarCodigo">
-                        <input type="text" name="codigoFunda" id="codigoFunda" class="codigoFunda"> <button type="submit" class="btn btn-primary codigoFunda" id="enviarCodigo">Comprobar</button>
+                        <input type="text" name="codigoFunda" id="codigoFunda" class="codigoFunda">
+                        <button type="submit" class="btn btn-primary codigoFunda" id="enviarCodigo">Comprobar</button>
                     </div>
                 </div>
                 <div class="card">
                     <div class="card-body">
-                        <form action='functions.php' method ='post'><button type='submit' class="btn btn-primary" name='exportar'>Exportar Todo <i class="bi bi-arrow-right-short"></i></button></form>
+                        <form action='functions.php' method='post'>
+                            <button type='submit' class="btn btn-primary" name='exportar'>Exportar Todo
+                                <i class="bi bi-arrow-right-short"></i>
+                            </button>
+                        </form>
                     </div>
                 </div>
                 <div class="card">
@@ -106,20 +113,25 @@ include_once 'Pagination.php';
                         <h3 class="card-title">Exportar por fecha</h3>
                     </div>
                     <div class="card-body" id="datepickerDiv">
-                        <form action='functions.php' method ='post'>
-                            <input type="text" name="fecha" id="datepicker" class="datepicker"> <button type="submit" class="btn btn-primary fecha" name="datepickerSubmit" id="datepickerSubmit">Exportar por fecha</button>
+                        <form action='functions.php' method='post'>
+                            <input type="text" name="fecha" id="datepicker" class="datepicker">
+                            <button type="submit" class="btn btn-primary fecha" name="datepickerSubmit" id="datepickerSubmit">Exportar por fecha</button>
                         </form>
                     </div>
                 </div>
-                
 
-                <div id="tablastock">
-                    <?php
+
+                <div id="tablastock"><?php
                     echo get_fundas();
                     ?>
                 </div>
-        </div>
-    </main>
-</div>
-</body>
+                <script>
+                    $(document).ready(function() {
+                        $('#cargando').hide();
+                        $('#mainContent').removeClass('d-none');
+                    });
+                </script>
+            </div>
+        </main>
+    </body>
 </html>

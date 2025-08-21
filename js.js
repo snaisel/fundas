@@ -566,7 +566,7 @@ $(document).ready(function () {
   $("#datepickerDiv").on("focus", ".datepicker", function () {
     $("#datepicker").datepicker();
   });
-  const choices = new Choices(document.querySelector(".choices-single"));
+  const choices = new Choices(document.getElementById("filterModel"));
 });
 function selectModel(val) {
   $("#search-box").val(val);
