@@ -1,11 +1,11 @@
-<header class="d-flex flex-wrap justify-content-center mb-4 border-bottom">
+<header class=" justify-content-center mb-4 border-bottom">
     <nav class="navbar navbar-expand-lg bg-light">
         <div class="container-fluid">
             <a href="index.php" class="navbar-brand">
+                <span class="fs-4">Fundas</span>
                 <svg class="bi me-2" width="40" height="32">
                     <use xlink:href="index.php"></use>
                 </svg>
-                <span class="fs-4">Fundas</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
@@ -38,13 +38,14 @@
                     <li class="nav-item">
                         <a href="doc.php" class="nav-link">Ayuda</a>
                     </li>
-                    <li class="nav-item">
-                        <form method="post" action="index.php" class="d-flex">
-                            <input type="hidden" name="logout" value="1">
-                            <button type="submit" class="btn btn-outline-danger">Cerrar sesión</button>
-                        </form>
-                    </li>
+                    
                 </ul>
+                
+                        <form method="post" action="index.php" class="d-flex mb-0">
+                            <input type="hidden" name="logout" value="1">
+                            <button type="submit" class="btn btn-outline-danger me-2">Cerrar sesión</button>
+                        </form>
+                    
             </div>
         </div>
     </nav>
