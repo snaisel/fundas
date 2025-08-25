@@ -347,7 +347,7 @@ function get_modelos($refMarca = null, $refYear = null) {
                     echo "</ul></li><li class='list-group-item'><h5>" . get_marca_name($marca) . "</h5><ul class='list-group'>";
                 }
             }
-            echo "<li class='list-group-item'>" . $row['refMarca'] . $row['refYear'] . $row['refModelo'] . " - " . $row['nombreModelo'];
+            echo "<li class='list-group-item'><a href='modelos.php?get_tabla=modelos&idModelo=" . $row['idModelo'] . "' class='btn btn-primary resumenModelo' id='" . $row['idModelo'] . "'>" . $row['refMarca'] . $row['refYear'] . $row['refModelo'] . " - " . $row['nombreModelo'] . "</a>";
             echo "<div><button type=button name='editarModelo' value=" . $row['idModelo'] . " class='botonEditarModelos btn btn-sm btn-success'>Editar</button>";
             echo "<button type=button name='eliminarModelo' value=" . $row['idModelo'] . " class='botonEliminarModelos btn btn-sm btn-danger'>Eliminar</button>";
             echo "<div></li>";
@@ -775,54 +775,66 @@ function select_model_stock($modelo = "") {
 
 function get_tabla_modelos($parametro = "idModelo", $orderby = "ASC", $page = 1, $limit = 20, $marca = NULL, $year = NULL, $modelo = NULL, $idModelo = NULL) {
     $con = getdb();
-    $query = $con->query("SELECT COUNT(*) as rowNum FROM modelo");
-    $result = $query->fetch_assoc();
-    $rowCount = $result['rowNum'];
-    $pages = $rowCount / $limit;
-    if ($rowCount % $limit > 0)
-        $pages++;
-    $actualPage = $limit * ($page - 1);
+
     if (is_null($idModelo)) {
-        if ($parametro == "stock") {
-            $Sql = "SELECT m.*, SUM(s.stock) AS totalStock FROM modelo m LEFT JOIN stock s ON s.idModelo = m.idModelo GROUP BY s.idModelo ORDER BY totalStock " . $orderby . " LIMIT " . $actualPage . ", " . $limit;
-        } else {
-            $Sql = "SELECT * FROM modelo ORDER BY " . $parametro . " " . $orderby . " LIMIT " . $actualPage . ", " . $limit;
-        }
-    } else {
-        $query = $con->query("SELECT COUNT(*) as rowNum FROM modelo WHERE `idModelo`=" . $idModelo);
+        $query = $con->query("SELECT COUNT(*) as rowNum FROM modelo");
         $result = $query->fetch_assoc();
         $rowCount = $result['rowNum'];
         $pages = $rowCount / $limit;
         if ($rowCount % $limit > 0)
             $pages++;
         $actualPage = $limit * ($page - 1);
-        $Sql = "SELECT * FROM modelo  WHERE `idModelo`=" . $idModelo . " ORDER BY " . $parametro . " " . $orderby . " LIMIT " . $actualPage . ", " . $limit;
-    }
-    $result = mysqli_query($con, $Sql);
-    $to = mysqli_num_rows($result) + $actualPage;
-    if (!$result) {
-        return false;//por aqui
+        if ($parametro == "stock") {
+            $Sql = "SELECT m.*, SUM(s.stock) AS totalStock FROM modelo m LEFT JOIN stock s ON s.idModelo = m.idModelo GROUP BY s.idModelo ORDER BY totalStock " . $orderby . " LIMIT " . $actualPage . ", " . $limit;
+        } else {
+            $Sql = "SELECT * FROM modelo ORDER BY " . $parametro . " " . $orderby . " LIMIT " . $actualPage . ", " . $limit;
+        }
+        $result = mysqli_query($con, $Sql);
+        $to = mysqli_num_rows($result) + $actualPage;
+        if (!$result) {
+            return false;//por aqui
+        } else {
+            $html = '<br>Mostrando del ' . $actualPage . ' al ' . $to . ' de ' . $rowCount;
+            $html .= '<table class="table table-striped" style="width:100%;">';
+            $html .= '<thead id="headModelos"><tr id="orderby" class="' . $orderby . '"><th><a href=# class="order modelos active" id="idModelo">Id</a></th><th><a href=# class="order modelos" id="refMarca">Marca</a></th><th><a href=# class="order modelos" id="refYear">Año</a></th><th><a href=# class="order modelos" id="nombreModelo">Modelo</a></th><th><a href=# class="order modelos" id="refCompleta">Ref</a></th><th><a href=# class="order modelos" id="stock">Stock</a></th><th>Relacionados</th><th>Acciones<span class="badge bg-warning text-dark">En construccion</span></th></tr></thead>';
+            $html .= '<tbody id="cuerpoModelos">';
+
+            while ($row = mysqli_fetch_assoc($result)) {
+                $model = $row['refMarca'] . $row['refYear'] . $row['refModelo'];
+                $html .= "<tr id=filaModelos" . $row['idModelo'] . "><td>" . $row['idModelo'] . "</td><td>" . get_marca_name($row['refMarca']) . "</td><td>" . $row['refYear'] . "</td><td>" . get_modelo_by_id($row['idModelo']) . "</td><td>" . $row['refMarca'] . $row['refYear'] . $row['refModelo'] . "</td>";
+                $html .= "<td>";
+                if ($parametro == "stock") {
+                    $html .= $row['totalStock'];
+                } else {
+                    $html .= get_stock_by_idModelo($row['idModelo']);
+                }
+                $html .= "</td><td>" . get_relaciones_title($model) . "</td>";
+                //$html .= "<td><button class='btn btn-info botoneditar' value='" . $row['idModelo'] . "' name='editar'>Editar <i class='bi bi-pencil'></i></button> <button class='botoneliminar btn btn-danger' value='" . $row['idModelo'] . "' name='eliminar'>Eliminar <i class='bi bi-trash'></i></button></td></tr>";
+            }
+            $html .= '</tbody></table>';
+            $html .= pagination($page, $pages, $actualPage, $rowCount, $to);
+            $html .= "";
+        }
     } else {
-        $html = '<br>Mostrando del ' . $actualPage . ' al ' . $to . ' de ' . $rowCount;
-        $html .= '<table class="table table-striped" style="width:100%;">';
-        $html .= '<thead id="headModelos"><tr id="orderby" class="' . $orderby . '"><th><a href=# class="order modelos active" id="idModelo">Id</a></th><th><a href=# class="order modelos" id="refMarca">Marca</a></th><th><a href=# class="order modelos" id="refYear">Año</a></th><th><a href=# class="order modelos" id="refModelo">Modelo</a></th><th><a href=# class="order modelos" id="refCompleta">Ref</a></th><th><a href=# class="order modelos" id="stock">Stock</a></th><th>Relacionados</th><th>Acciones<span class="badge bg-warning text-dark">En construccion</span></th></tr></thead>';
+        $Sql = "SELECT * FROM modelo  WHERE `idModelo`=" . $idModelo . " ORDER BY " . $parametro . " " . $orderby;
+        $result = mysqli_query($con, $Sql);
+        $html = '<table class="table table-striped" style="width:100%;">';
+        $html .= '<thead id="headModelos"><tr id="orderby" class="' . $orderby . '"><th><span class="order modelos active" id="idModelo">Id</span></th><th><span class="order modelos" id="refMarca">Marca</span></th><th><span class="order modelos" id="refYear">Año</span></th><th><span class="order modelos" id="nombreModelo">Modelo</span></th><th><span class="order modelos" id="refCompleta">Ref</span></th><th><span class="order modelos" id="stock">Stock</span></th><th>Relacionados</th><th>Acciones<span class="badge bg-warning text-dark">En construccion</span></th></tr></thead>';
         $html .= '<tbody id="cuerpoModelos">';
 
         while ($row = mysqli_fetch_assoc($result)) {
             $model = $row['refMarca'] . $row['refYear'] . $row['refModelo'];
             $html .= "<tr id=filaModelos" . $row['idModelo'] . "><td>" . $row['idModelo'] . "</td><td>" . get_marca_name($row['refMarca']) . "</td><td>" . $row['refYear'] . "</td><td>" . get_modelo_by_id($row['idModelo']) . "</td><td>" . $row['refMarca'] . $row['refYear'] . $row['refModelo'] . "</td>";
             $html .= "<td>";
-            if ($parametro == "stock") {
-                $html .= $row['totalStock'];
-            } else {
-                $html .= get_stock_by_idModelo($row['idModelo']);
-            }
+
+            $html .= get_stock_by_idModelo($row['idModelo']);
+
             $html .= "</td><td>" . get_relaciones_title($model) . "</td>";
             //$html .= "<td><button class='btn btn-info botoneditar' value='" . $row['idModelo'] . "' name='editar'>Editar <i class='bi bi-pencil'></i></button> <button class='botoneliminar btn btn-danger' value='" . $row['idModelo'] . "' name='eliminar'>Eliminar <i class='bi bi-trash'></i></button></td></tr>";
         }
         $html .= '</tbody></table>';
-        $html .= pagination($page, $pages, $actualPage, $rowCount, $to);
-        $html .= "";
+
+
     }
     return $html;
 }

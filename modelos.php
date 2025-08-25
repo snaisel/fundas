@@ -18,7 +18,15 @@ $con = getdb();
             <?php include 'header.php'; ?>
             <main>
                 <div id="tablamodelos">
-                <?php echo get_tabla_modelos() ?>
+                <?php
+                if (!empty($_GET)) {;
+                    echo get_tabla_modelos("idModelo", "ASC", 1, 20,null,null,null,$_GET['idModelo']);
+                    echo "<a class='btn btn-primary' href='modelos.php'>Ver todos los modelos</a>";
+                }
+                else{
+                echo get_tabla_modelos();
+                }
+                ?>
                 </div>
             </main>
     </body>
