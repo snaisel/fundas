@@ -277,6 +277,17 @@ function get_modelo($modelo) {
         return $row['nombreModelo'];
     }
 }
+function get_modelo_by_id($idModelo) {
+    $con = getdb();
+    $Sql = "SELECT * FROM modelo WHERE `idModelo` = " . intval($idModelo);
+    $result = mysqli_query($con, $Sql);
+    if (!$result) {
+        return false;
+    } else {
+        $row = mysqli_fetch_assoc($result);
+        return $row['nombreModelo'];
+    }
+}
 function get_marca_by_modelo($ref) {
     $con = getdb();
     $Sql = "SELECT refMarca FROM modelo WHERE `refMarca`=" . substr($ref, 0, 2) . " AND `refYear` = " . substr($ref, 2, 2) . " AND `refModelo`=" . substr($ref, 4, 2) . " LIMIT 1";
@@ -430,23 +441,12 @@ function get_fundas($parametro = "idStock", $orderby = "DESC", $page = 1, $limit
         $html .= "</div><div class='col text-end'>Mostrando del " . $actualPage . " al " . $to . " de " . $rowCount . "</div></div>";
         if (get_relaciones_title($modelo) && $modelo != "") {
             $relacionados = get_relaciones_title($modelo);
-
             $html .= "<div class='alert alert-sm alert-info'>Modelos relacionados: " . $relacionados . "</div>";
+
         }
         $html .= "<table class='table table-striped' style='width:100%;'><thead><tr><th><a href='#' class='ordenar active' id='idStock'>Codigo</a></th><th><a href='#' class='ordenar'  id='idMarca'>Marca</a></th><th><a href='#' class='ordenar'  id='refModel'>Modelo</a></th><th><a href='#' class='ordenar'  id='refTipo'>Tipo</a></th><th><a href='#' class='ordenar'  id='refColor'>Color</a></th><th>Precio</th><th>Rel</th><th><a href='#' class='ordenar'  id='stock'>Stock</a></th><th><a href='#' class='ordenar'  id='modificado'>Modificado</a></th><th>Acciones</th></tr></thead><tbody id='cuerpostock' class='" . $orderby . "'>";
         while ($row = mysqli_fetch_assoc($result)) {
-            $tipo = str_pad($row['refTipo'], 2, '0', STR_PAD_LEFT);
-            $color = str_pad($row['refColor'], 2, '0', STR_PAD_LEFT);
-            $codigo = str_pad($row['idStock'], 6, '0', STR_PAD_LEFT);
-            $usarrel = "No";
-            $relacionados = get_modelo($row['refModel']);
-            if ($row['usarRel'] == 1) {
-                $usarrel = "Si";
-                if (get_relaciones_title($row['refModel'])) {
-                    $relacionados = get_relaciones_title($row['refModel']);
-                }
-            }
-            $html .= "<tr id=fila" . $row['idStock'] . "><td>" . $codigo . "</td><td>" . get_marca_name(substr($row['refModel'], 0, 2)) . "</td><td>" . $relacionados . "</td><td>" . get_tipo($row['refTipo']) . "</td><td>" . get_color($row['refColor']) . " <span style='width:16px;height:16px;display: inline-block;background:" . get_thumb($row['refColor']) . ";'> </span></td><td>" . get_precio($row['refTipo']) . "€</td><td>" . $usarrel . "</td><td>" . $row['stock'] . "</td><td>" . $row['modificado'] . "</td><td><button class='btn btn-info botoneditar' value='" . $row['idStock'] . "' name='editar'>Editar <i class='bi bi-pencil'></i></button> <button class='botoneliminar btn btn-danger' value='" . $row['idStock'] . "' name='eliminar'>Eliminar <i class='bi bi-trash'></i></button></td></tr>";
+            $html .= get_funda_row($row['idStock'], $row['refModel'], $row['refTipo'], $row['refColor'], $row['usarRel'], $row['stock'], $row['modificado']);
         }
         $html .= "</tbody></table>";
         if ($rowCount == 0) {
@@ -455,6 +455,33 @@ function get_fundas($parametro = "idStock", $orderby = "DESC", $page = 1, $limit
         $html .= pagination($page, $pages, $actualPage, $rowCount, $to);
     }
     return $html;
+}
+function get_funda_row($idStock, $refModel, $refTipo, $refColor, $usarrel, $stock, $modificado) {
+    $codigo = str_pad($idStock, 6, '0', STR_PAD_LEFT);
+    $usarrelacion = "No";
+    $relacionados = get_modelo($refModel);
+    if ($usarrel == 1) {
+        $usarrelacion = "Si";
+        if (get_relaciones_title($refModel)) {
+            $relacionados = get_relaciones_title($refModel);
+        }
+    }
+    $html = "<tr id=fila" . $idStock . "><td>" . $codigo . "</td><td>" . get_marca_name(substr($refModel, 0, 2)) . "</td><td>" . $relacionados . "</td><td>" . get_tipo($refTipo) . "</td><td>" . get_color($refColor) . " <span style='width:16px;height:16px;display: inline-block;background:" . get_thumb($refColor) . ";'> </span></td><td>" . get_precio($refTipo) . "€</td><td>" . $usarrelacion . "</td><td>" . $stock . "</td><td>" . $modificado . "</td><td><button class='btn btn-info botoneditar' value='" . $idStock . "' name='editar'>Editar <i class='bi bi-pencil'></i></button> <button class='botoneliminar btn btn-danger' value='" . $idStock . "' name='eliminar'>Eliminar <i class='bi bi-trash'></i></button></td></tr>";
+    return $html;
+}
+function get_fundas_array_by_model($model) {
+    $con = getdb();
+    $Sql = "SELECT * FROM stock WHERE `refModel`=" . $model;
+    $result = mysqli_query($con, $Sql);
+    if (!$result) {
+        return false;
+    } else {
+        $fundas = array();
+        while ($row = mysqli_fetch_assoc($result)) {
+            $fundas[] = $row;
+        }
+        return $fundas;
+    }
 }
 
 function get_fundas_csv($modelo = NULL) {
@@ -534,8 +561,9 @@ function get_fundas_csv_fechas($fecha) {
     return $html;
 }
 
-function get_relaciones($modelo = 0) {
+function get_relaciones($modelo = 0, $array = null) {
     $con = getdb();
+
     if ($modelo == 0) {
         $Sql = "SELECT * FROM `relacionados`";
     } else {
@@ -545,20 +573,30 @@ function get_relaciones($modelo = 0) {
     if (!$result) {
         return false;
     } else {
-        $relacionados = " ";
+        if ($array) {
+            $relacionados = array();
+        } else {
+            $relacionados = " ";
+        }
         while ($row = mysqli_fetch_assoc($result)) {
-            $relacionados .= "<div id='relacionados" . $row['idRel'] . "' class='eliminarRelaciones mb-5 col-lg-2 col-md-3 col-sm-6 '><h6>Referencia " . $row['idRel'] . "</h6><ul class='list-group'>";
-            $referencias = unserialize($row['referencias']);
-            if (is_array($referencias)) {
-                foreach ($referencias as $referencia) {
-                    $relacionados .= "<li class='list-group-item'>" . get_marca_name(get_marca_by_modelo($referencia)) . " " . get_modelo($referencia) . "</li>";
+            if ($array) {
+                if ($row['referencias'] != $modelo) {
+                    $relacionados = unserialize($row['referencias']);
                 }
             } else {
-                $relacionados .= "<li class='list-group-item'>" . get_marca_name(get_marca_by_modelo($referencias)) . " " . get_modelo($referencias) . "</li>";
+                $relacionados .= "<div id='relacionados" . $row['idRel'] . "' class='eliminarRelaciones mb-5 col-lg-2 col-md-3 col-sm-6 '><h6>Referencia " . $row['idRel'] . "</h6><ul class='list-group'>";
+                $referencias = unserialize($row['referencias']);
+                if (is_array($referencias)) {
+                    foreach ($referencias as $referencia) {
+                        $relacionados .= "<li class='list-group-item'>" . get_marca_name(get_marca_by_modelo($referencia)) . " " . get_modelo($referencia) . "</li>";
+                    }
+                } else {
+                    $relacionados .= "<li class='list-group-item'>" . get_marca_name(get_marca_by_modelo($referencias)) . " " . get_modelo($referencias) . "</li>";
+                }
+                $relacionados .= "</ul><button class='btn btn-danger eliminarRelacion' value='" . $row['idRel'] . "'>Eliminar <i class='bi bi-trash'></i></button></div>";
             }
-            $relacionados .= "</ul><button class='btn btn-danger eliminarRelacion' value='" . $row['idRel'] . "'>Eliminar <i class='bi bi-trash'></i></button></div>";
         }
-        if ($relacionados == " ") {
+        if ($relacionados == " " && !$array) {
             $relacionados = "<div class='alert alert-warning'>No hay relaciones registradas</div>";
         }
 
@@ -566,10 +604,10 @@ function get_relaciones($modelo = 0) {
     }
 }
 
-function get_stock_by_model($model) {
+function get_stock_by_idModelo($idModelo) {
     $total = 0;
     $con = getdb();
-    $Sql = "SELECT * FROM `stock` WHERE `refModel`=" . $model;
+    $Sql = "SELECT * FROM `stock` WHERE `idModelo`=" . intval($idModelo);
     $result = mysqli_query($con, $Sql);
     if (!$result) {
         return false;
@@ -745,9 +783,13 @@ function get_tabla_modelos($parametro = "idModelo", $orderby = "ASC", $page = 1,
         $pages++;
     $actualPage = $limit * ($page - 1);
     if (is_null($idModelo)) {
-        $Sql = "SELECT * FROM modelo ORDER BY " . $parametro . " " . $orderby . " LIMIT " . $actualPage . ", " . $limit;
+        if ($parametro == "stock") {
+            $Sql = "SELECT m.*, SUM(s.stock) AS totalStock FROM modelo m LEFT JOIN stock s ON s.idModelo = m.idModelo GROUP BY s.idModelo ORDER BY totalStock " . $orderby . " LIMIT " . $actualPage . ", " . $limit;
+        } else {
+            $Sql = "SELECT * FROM modelo ORDER BY " . $parametro . " " . $orderby . " LIMIT " . $actualPage . ", " . $limit;
+        }
     } else {
-        $query = $con->query("SELECT COUNT(*) as rowNum FROM model WHERE `idModelo`=" . $idModelo);
+        $query = $con->query("SELECT COUNT(*) as rowNum FROM modelo WHERE `idModelo`=" . $idModelo);
         $result = $query->fetch_assoc();
         $rowCount = $result['rowNum'];
         $pages = $rowCount / $limit;
@@ -755,22 +797,27 @@ function get_tabla_modelos($parametro = "idModelo", $orderby = "ASC", $page = 1,
             $pages++;
         $actualPage = $limit * ($page - 1);
         $Sql = "SELECT * FROM modelo  WHERE `idModelo`=" . $idModelo . " ORDER BY " . $parametro . " " . $orderby . " LIMIT " . $actualPage . ", " . $limit;
-        ;
     }
     $result = mysqli_query($con, $Sql);
     $to = mysqli_num_rows($result) + $actualPage;
     if (!$result) {
-        return false;
+        return false;//por aqui
     } else {
         $html = '<br>Mostrando del ' . $actualPage . ' al ' . $to . ' de ' . $rowCount;
         $html .= '<table class="table table-striped" style="width:100%;">';
-        $html .= '<thead id="headModelos"><tr id="orderby" class="' . $orderby . '"><th><a href=# class="order modelos active" id="idModelo">Id</a></th><th><a href=# class="order modelos" id="refMarca">Marca</a></th><th><a href=# class="order modelos" id="refYear">Año</a></th><th><a href=# class="order modelos" id="refModelo">Modelo</a></th><th><a href=# class="order modelos" id="refCompleta">Ref</a></th><th>Stock</th><th>Relacionados</th><th>Acciones<span class="badge bg-warning text-dark">En construccion</span></th></tr></thead>';
+        $html .= '<thead id="headModelos"><tr id="orderby" class="' . $orderby . '"><th><a href=# class="order modelos active" id="idModelo">Id</a></th><th><a href=# class="order modelos" id="refMarca">Marca</a></th><th><a href=# class="order modelos" id="refYear">Año</a></th><th><a href=# class="order modelos" id="refModelo">Modelo</a></th><th><a href=# class="order modelos" id="refCompleta">Ref</a></th><th><a href=# class="order modelos" id="stock">Stock</a></th><th>Relacionados</th><th>Acciones<span class="badge bg-warning text-dark">En construccion</span></th></tr></thead>';
         $html .= '<tbody id="cuerpoModelos">';
 
         while ($row = mysqli_fetch_assoc($result)) {
             $model = $row['refMarca'] . $row['refYear'] . $row['refModelo'];
-            $html .= "<tr id=filaModelos" . $row['idModelo'] . "><td>" . $row['idModelo'] . "</td><td>" . get_marca_name($row['refMarca']) . "</td><td>" . $row['refYear'] . "</td><td>" . get_modelo($row['refMarca'] . $row['refYear'] . $row['refModelo']) . "</td><td>" . $row['refMarca'] . $row['refYear'] . $row['refModelo'] . "</td>";
-            $html .= "<td>" . get_stock_by_model($model) . "</td><td>" . get_relaciones_title($model) . "</td>";
+            $html .= "<tr id=filaModelos" . $row['idModelo'] . "><td>" . $row['idModelo'] . "</td><td>" . get_marca_name($row['refMarca']) . "</td><td>" . $row['refYear'] . "</td><td>" . get_modelo_by_id($row['idModelo']) . "</td><td>" . $row['refMarca'] . $row['refYear'] . $row['refModelo'] . "</td>";
+            $html .= "<td>";
+            if ($parametro == "stock") {
+                $html .= $row['totalStock'];
+            } else {
+                $html .= get_stock_by_idModelo($row['idModelo']);
+            }
+            $html .= "</td><td>" . get_relaciones_title($model) . "</td>";
             //$html .= "<td><button class='btn btn-info botoneditar' value='" . $row['idModelo'] . "' name='editar'>Editar <i class='bi bi-pencil'></i></button> <button class='botoneliminar btn btn-danger' value='" . $row['idModelo'] . "' name='eliminar'>Eliminar <i class='bi bi-trash'></i></button></td></tr>";
         }
         $html .= '</tbody></table>';

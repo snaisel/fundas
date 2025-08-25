@@ -480,7 +480,7 @@ $(document).ready(function () {
         data: { parametro: id, ascdesc: ascdesc, page: page, model: model },
         beforeSend: function () {
           $("#filterModel").after(
-            '  <div class="spinner-border text-info" style="width:14px; height:14px" role="status"><span class="visually-hidden">Loading...</span></div>'
+            '  <span class="spinner-border text-info" style="width:14px; height:14px" role="status"><span class="visually-hidden">Loading...</span></span>'
           );
         },
         success: function (data) {
@@ -513,7 +513,7 @@ $(document).ready(function () {
       data: { parametro: $(this).attr("id"), orderby: ascdesc },
       beforeSend: function () {
         $("#" + id + ".order").after(
-          '<div class="spinner-border text-info" style="width:14px; height:14px" role="status"><span class="visually-hidden">Loading...</span></div>'
+          '<span class="spinner-border text-info" style="width:14px; height:14px" role="status"><span class="visually-hidden">Loading...</span></span>'
         );
       },
       success: function (data) {

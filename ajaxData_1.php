@@ -3,7 +3,14 @@
 require 'class.php';
 
 if (isset($_POST['parametro'])) {
-    if ($_POST['parametro'] == "refCompleta") {
+    if ($_POST['parametro'] == "stock") {
+        if (!isset($_POST['page'])) {
+        echo get_tabla_modelos("stock", $_POST['orderby'], 1, 20, NULL, NULL, NULL, NULL);
+        }
+        else if (isset($_POST['page'])) {
+            echo get_tabla_modelos("stock", $_POST['orderby'], $_POST['page']);
+        }
+    } else if ($_POST['parametro'] == "refCompleta") {
         $parametro = "refMarca, refYear, refModelo";
         if (isset($_POST['model']) && $_POST['model'] != "" && !isset($_POST['page'])) {
             echo get_tabla_modelos($parametro, $_POST['orderby'], 1, 20, $_POST['model']);
