@@ -109,7 +109,7 @@ if (!empty($_POST["idStockEditar"])) {
                         echo "Marcas" . select_marcas(substr($row['refModel'], 0, 2));
                         echo "Año" . select_year(substr($row['refModel'], 2, 2));
                         echo "Modelo";
-                        echo select_modelos($row['refModel']);
+                        echo select_modelos_by_id($row['idModelo']);
                         ?>
                         </div>
                         <div
@@ -134,7 +134,7 @@ if (!empty($_POST["idStockEditar"])) {
                                 <input type="radio" id="no" value="0" name="usarrel" <?php if ($row['usarRel'] == 0)
                                     echo " checked"; ?>><label for="no">No</label>
                             </div>
-                            <button class="btn btn-primary" type="submit" id="enviarStock">Enviar</button>
+                            <button class="btn btn-primary" type="submit" id="enviarStock" name="enviarStock">Enviar</button>
                         </div>
                     </div>
                 </div>

@@ -41,9 +41,9 @@ include_once 'Pagination.php';
                         <div class="row">
                             <div class="form-group col-sm-4">
                                 <?php
-                                if (isset($_SESSION['variables']['modelo'])) {
-                                    echo "Marcas" . select_marcas(substr($_SESSION['variables']['modelo'], 0, 2));
-                                    echo "Año" . select_year(substr($_SESSION['variables']['modelo'], 2, 2));
+                                if (isset($_SESSION['variables']['ref'])) {
+                                    echo "Marcas" . select_marcas(substr($_SESSION['variables']['ref'], 0, 2));
+                                    echo "Año" . select_year(substr($_SESSION['variables']['ref'], 2, 2));
                                 } else {
                                     echo "Marcas" . select_marcas();
                                     echo "Año" . select_year();
@@ -51,8 +51,8 @@ include_once 'Pagination.php';
                                 echo "Modelo";
                                 ?>
                                 <?php
-                                if (isset($_SESSION['variables']['modelo'])) {
-                                    echo select_modelos($_SESSION['variables']['modelo']);
+                                if (isset($_SESSION['variables']['modelos'])) {
+                                    echo select_modelos_by_id($_SESSION['variables']['modelos']);
                                 } else {
                                     ?>
                                     <select name="modelos" class='form-select' id="modelos">

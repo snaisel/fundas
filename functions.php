@@ -1,5 +1,6 @@
 <?php
-
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 require 'class.php';
 
 $con = getdb();
@@ -119,9 +120,10 @@ if (isset($_POST['relmodelos'])) {
     echo "<script type=\"text/javascript\">alert(\"Referencia insertada.\");window.location = \"opciones.php\"
                </script>";
 }
-if (isset($_POST['stock'])) {
+if (isset($_POST['enviarStock'])) {
     $_SESSION['variables'] = array(
-        "modelo" => $_POST['modelos'],
+        "modelos" => $_POST['modelos'],
+        "ref"=>get_refCompleta_by_idModelo($_POST['modelos']),
         "tipo" => $_POST['tipo'],
         "color" => $_POST['color'],
         "stock" => $_POST['stock'],
@@ -131,18 +133,18 @@ if (isset($_POST['stock'])) {
     } else {
         $idStock = get_stock($_POST['modelos'], $_POST['tipo'], $_POST['color']);
     }
-    $idMarca = get_marca_id(substr($_POST['modelos'], 0, 2));
+    $idMarca = get_marca_id(substr(get_refCompleta_by_idModelo($_POST['modelos']), 0, 2));
     $idRel = 0;
     $fecha = date('Y-m-d');
     if ($_POST['usarrel'] == 1) {
         $idRel = get_rel_id($_POST['modelos']);
     }
     if ($idStock) {
-        echo $sql = "UPDATE `stock` SET `refModel`= " . $_POST['modelos'] . ", `refTipo`= " . $_POST['tipo'] . ", `refColor`= " . $_POST['color'] . ", `idMarca`= " . $idMarca . ", `stock`= " . $_POST['stock'] . ", `usarRel` = " . $_POST['usarrel'] . ", `idRel` = " . $idRel . ", `modificado` = '" . $fecha . "' WHERE `idStock`=" . $idStock;
+        echo $sql = "UPDATE `stock` SET `refModel`= " . get_refCompleta_by_idModelo($_POST['modelos']) . ",`idModelo`= " . $_POST['modelos'] . ", `refTipo`= " . $_POST['tipo'] . ", `refColor`= " . $_POST['color'] . ", `idMarca`= " . $idMarca . ", `stock`= " . $_POST['stock'] . ", `usarRel` = " . $_POST['usarrel'] . ", `idRel` = " . $idRel . ", `modificado` = '" . $fecha . "' WHERE `idStock`=" . $idStock;
         $result = mysqli_query($con, $sql);
-        echo "<script type=\"text/javascript\">alert(\"Funda para " . get_modelo($_POST['modelos']) . " modificada!!!.\");window.location = \"acciones.php\"</script>";
+        echo "<script type=\"text/javascript\">alert(\"Funda para " . get_modelo_by_id($_POST['modelos']) . " modificada!!!.\");window.location = \"acciones.php\"</script>";
     } else {
-        $sql = "INSERT INTO `stock`(`refModel`, `refTipo`, `refColor`, `stock`, `usarRel`, `idMarca`, `idRel`, `modificado`) VALUES (" . $_POST['modelos'] . ", " . $_POST['tipo'] . ", " . $_POST['color'] . ", " . $_POST['stock'] . ", " . $_POST['usarrel'] . ", " . $idMarca . ", " . $idRel . ", '" . $fecha . "')";
+        $sql = "INSERT INTO `stock`(`refModel`, `idModelo`,  `refTipo`, `refColor`, `stock`, `usarRel`, `idMarca`, `idRel`, `modificado`) VALUES (" . get_refCompleta_by_idModelo($_POST['modelos']) . ", " . $_POST['modelos'] . ", " . $_POST['tipo'] . ", " . $_POST['color'] . ", " . $_POST['stock'] . ", " . $_POST['usarrel'] . ", " . $idMarca . ", " . $idRel . ", '" . $fecha . "')";
         $result = mysqli_query($con, $sql);
         echo "<script type=\"text/javascript\">alert(\"Referencia insertada.\");window.location = \"acciones.php\"</script>";
     }
@@ -180,7 +182,7 @@ if (isset($_POST['submitSumar'])) {
     echo "<script type=\"text/javascript\">;window.location = \"sumar.php\"</script>";
 }
 if (isset($_POST['submitRestar'])) {
-    $sql = "UPDATE `stock` SET `stock`= stock - 1, `modificado`='" . date('Y-m-d') . "' WHERE `idStock` = " . $_POST['textoRestar']."  AND `stock` > 0;";
+    $sql = "UPDATE `stock` SET `stock`= stock - 1, `modificado`='" . date('Y-m-d') . "' WHERE `idStock` = " . $_POST['textoRestar'] . "  AND `stock` > 0;";
     $result1 = mysqli_query($con, $sql);
     $sql = "SELECT * FROM `stock` WHERE idStock =" . $_POST['textoRestar'];
     $result2 = mysqli_query($con, $sql);
@@ -192,7 +194,7 @@ if (isset($_POST['submitRestar'])) {
     echo "<script type=\"text/javascript\">;window.location = \"restar.php\"</script>";
 }
 if (isset($_POST['submitReset'])) {
-    if (isset($_POST['resetAll'])) {        
+    if (isset($_POST['resetAll'])) {
         $sql = "UPDATE `stock` SET `stock`= 0, `modificado`='" . date('Y-m-d') . "'";
         $result1 = mysqli_query($con, $sql);
         echo "<script type=\"text/javascript\">alert(\"Todo ha sido puesto a 0.\");window.location = \"restar.php\"</script>";

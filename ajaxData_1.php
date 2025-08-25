@@ -53,3 +53,22 @@ if (isset($_POST['parametro'])) {
 //    $html .= "</tbody></table>";
 //    echo $html;
 }
+if (isset($_POST['modalResumenModelos'])) {
+    if (isset($_POST['idModelo']) && $_POST['idModelo'] != "") {
+        echo get_resumen_modelo($_POST['idModelo']);
+    } else {
+        echo "<p>Error: No se ha recibido idModelo</p>";
+    }
+}
+if (isset($_POST['borrarFundas'])) {
+    if (isset($_POST['idModelo']) && $_POST['idModelo'] != "") {
+        $con = getdb();
+        $query = "DELETE FROM `stock` WHERE `idModelo` = '" . $_POST["idModelo"] . "'";
+        $result = mysqli_query($con, $query);
+        if (!empty($result)) {
+            echo get_tabla_modelos();
+        }
+    } else {
+        echo "<p>Error: No se ha recibido idModelo</p>";
+    }
+}
