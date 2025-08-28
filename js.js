@@ -24,59 +24,68 @@ $(document).ready(function () {
     });
     $("#resultadosRel").html(str);
   });
-  $("#formularioStock").on("change", "#marcas", function () {
-    $("#marcas option:selected").each(function () {
+  $("#formularioStock").on("change", "#selectMarcas", function () {
+    $("#selectMarcas option:selected").each(function () {
       var marcasID = $(this).val();
-      var yearID = $("#year").val();
+      var yearID = $("#selectYear").val();
       if (marcasID) {
         $.post(
           "ajaxData.php",
-          { refMarca: marcasID, refYear: yearID },
+          { idMarca: marcasID, idYear: yearID, changeModelos: true },
           function (data) {
-            $("#modelos").html(data);
+            $("#selectModelos").html(data);
           }
         );
       } else {
-        $("#modelos").html(
+        $("#selectModelos").html(
           '<option value="">Selecciona una marca primero</option>'
         );
       }
     });
   });
-  $("#formularioStock").on("change", "#year", function () {
-    $("#year option:selected").each(function () {
+  $("#formularioStock").on("change", "#selectYear", function () {
+    $("#selectYear option:selected").each(function () {
       var yearID = $(this).val();
-      var marcasID = $("#marcas").val();
+      var marcasID = $("#selectMarcas").val();
       if (yearID) {
         $.post(
           "ajaxData.php",
-          { refYear: yearID, refMarca: marcasID },
+          { idYear: yearID, idMarca: marcasID, changeModelos: true },
           function (data) {
-            $("#modelos").html(data);
+            $("#selectModelos").html(data);
           }
         );
       } else {
-        $("#modelos").html(
+        $("#selectModelos").html(
           '<option value="">Selecciona una marca primero</option>'
         );
       }
     });
   });
-  $("#formularioStock").on("change", "#modelos", function () {
-    $("#modelos option:selected").each(function () {
+  $("#formularioStock").on("change", "#selectModelos", function () {
+    $("#selectModelos option:selected").each(function () {
       var modelID = $(this).val();
       if (modelID) {
-        $.post("ajaxData.php", { refModel: modelID }, function (data) {
-          $("#year").html(data);
-        });
+        $.post(
+          "ajaxData.php",
+          { idModelo: modelID, changeModelos: true },
+          function (data) {
+            $("#selectYear").html(data);
+          }
+        );
       }
     });
   });
-
+  $("#formularioStock").on("click", "#resetFormulario", function () {
+    console.log("resetFormulario clicked");
+    $.post("ajaxData.php", { resetFormulario: true }, function (data) {
+      $("#formularioStock").html(data);
+    });
+  });
   $("#color").on("change", function () {
     $("#color option:selected").each(function () {
       var colorID = $(this).val();
-      var modelID = $("#modelos").val();
+      var modelID = $("#selectModelos").val();
       var tipoID = $("#tipo").val();
       if (colorID) {
         $.post(
@@ -92,9 +101,9 @@ $(document).ready(function () {
     });
   });
   $("#colorref").on("keyup", function () {
-    var colorID = $(this).val();
-    if (colorID) {
-      $.post("ajaxData.php", { refColoroption: colorID }, function (data) {
+    var colorRef = $(this).val();
+    if (colorRef) {
+      $.post("ajaxData.php", { refColoroption: colorRef }, function (data) {
         $("#colorreftext").html(data);
       });
     } else {
@@ -137,7 +146,6 @@ $(document).ready(function () {
   });
   $("#tablastock").on("click", ".botoneditar", function () {
     var id = $(this).val();
-    console.log(id);
     $.ajax({
       type: "POST",
       url: "ajaxData.php",
@@ -150,7 +158,6 @@ $(document).ready(function () {
   });
   $("#comprobarCodigo").on("click", "#enviarCodigo", function () {
     var id = $("#codigoFunda").val();
-    console.log(id);
     $.ajax({
       type: "POST",
       url: "ajaxData.php",
@@ -194,29 +201,47 @@ $(document).ready(function () {
       }
     }
   );
-  let marcaref = null;
-  let yearref = null;
+  let marcaid = null;
+  let yearid = null;
   let removeFilter = false;
   $("#listadoMarcas").on("click", ".botonListadoMarcas", function () {
-    marcaref = $(this).val();
+    marcaid = $(this).val();
+    var $btn = $(this);
     $.ajax({
       type: "POST",
       url: "ajaxData.php",
-      data: "idMarcaListado=" + marcaref,
+      data: "idMarcaListado=" + marcaid,
+      beforeSend: function () {
+        $btn.after(
+          '  <div class="spinner-border text-info spinner-temp" style="width:14px; height:14px" role="status"><span class="visually-hidden">Loading...</span></div>'
+        );
+      },
       success: function (data) {
         $("#listadoModelos").html(data);
+      },
+      complete: function () {
+        $(".spinner-temp").remove();
       },
     });
     filterByMarcaYear();
   });
   $("#listadoYear").on("click", ".botonListadoYear", function () {
-    yearref = $(this).val();
+    yearid = $(this).val();
+    var $btn = $(this);
     $.ajax({
       type: "POST",
       url: "ajaxData.php",
-      data: "refYearListado=" + yearref,
+      data: "idYearListado=" + yearid,
+      beforeSend: function () {
+        $btn.after(
+          '  <div class="spinner-border text-info spinner-temp" style="width:14px; height:14px" role="status"><span class="visually-hidden">Loading...</span></div>'
+        );
+      },
       success: function (data) {
         $("#listadoModelos").html(data);
+      },
+      complete: function () {
+        $(".spinner-temp").remove();
       },
     });
     filterByMarcaYear();
@@ -224,53 +249,41 @@ $(document).ready(function () {
   $("#listadoModelos").on("click", ".modeloFilter", function () {
     removeFilter = true;
     if ($(this).attr("id") === "yearFilter") {
-      yearref = null;
-      console.log("yearref is null");
+      yearid = null;
+      console.log("yearid is null");
     } else if ($(this).attr("id") === "marcaFilter") {
-      marcaref = null;
-      console.log("marcaref is null");
+      marcaid = null;
+      console.log("marcaid is null");
     }
+    $(this).after(
+      '  <div class="spinner-border text-info spinner-temp" style="width:14px; height:14px" role="status"><span class="visually-hidden">Loading...</span></div>'
+    );
     filterByMarcaYear();
   });
   function filterByMarcaYear() {
-    if (marcaref && yearref) {
+    if (marcaid && yearid) {
       $.post(
         "ajaxData.php",
-        { refMarcaFilter: marcaref, refYearFilter: yearref },
+        { idMarcaFilter: marcaid, idYearFilter: yearid },
         function (data) {
           $("#listadoModelos").html(data);
         }
       );
-    }
-    else if (yearref && !marcaref && removeFilter) {
+    } else if (yearid && !marcaid && removeFilter) {
       removeFilter = false;
-      $.post(
-        "ajaxData.php",
-        { refYearListado: yearref },
-        function (data) {
-          $("#listadoModelos").html(data);
-        }
-      );
-    }
-    else if (marcaref && !yearref && removeFilter) {
+      $.post("ajaxData.php", { idYearListado: yearid }, function (data) {
+        $("#listadoModelos").html(data);
+      });
+    } else if (marcaid && !yearid && removeFilter) {
       removeFilter = false;
-      $.post(
-        "ajaxData.php",
-        { idMarcaListado: marcaref },
-        function (data) {
-          $("#listadoModelos").html(data);
-        }
-      );
-    }
-    else if (!marcaref && !yearref && removeFilter) {
+      $.post("ajaxData.php", { idMarcaListado: marcaid }, function (data) {
+        $("#listadoModelos").html(data);
+      });
+    } else if (!marcaid && !yearid && removeFilter) {
       removeFilter = false;
-      $.post(
-        "ajaxData.php",
-        { noFilters: true},
-        function (data) {
-          $("#listadoModelos").html(data);
-        }
-      );
+      $.post("ajaxData.php", { noFilters: true }, function (data) {
+        $("#listadoModelos").html(data);
+      });
     }
   }
   $("#listadoMarcas").on("click", ".botonEliminarMarcas", function () {
@@ -315,7 +328,6 @@ $(document).ready(function () {
       return false;
     }
   });
-
   $("#listadoModelos").on("click", ".botonEliminarModelos", function () {
     // Muestra el cuadro de confirmación
     if (confirm("¿Estás seguro de que deseas eliminar este modelo?")) {
@@ -353,6 +365,9 @@ $(document).ready(function () {
         } else {
           document.getElementById("idModelo").value = data.idModelo;
           document.getElementById("nombreModelo").value = data.nombreModelo;
+          document.getElementById("refModelo").value = data.refModelo;
+          document.getElementById("year").value = data.idYear;
+          document.getElementById("marcas").value = data.idMarca;
           var myModal = new bootstrap.Modal(
             document.getElementById("editarModeloModal")
           );
@@ -360,7 +375,6 @@ $(document).ready(function () {
         }
       });
   });
-
   $("#listadoTipos").on("click", ".botonEliminarTipos", function () {
     // Muestra el cuadro de confirmación
     if (confirm("¿Estás seguro de que deseas eliminar este tipo?")) {
@@ -480,17 +494,23 @@ $(document).ready(function () {
         data: { parametro: id, ascdesc: ascdesc, page: page, model: model },
         beforeSend: function () {
           $("#filterModel").after(
-            '  <span class="spinner-border text-info" style="width:14px; height:14px" role="status"><span class="visually-hidden">Loading...</span></span>'
+            '<span class="spinner-border text-info" style="width:14px; height:14px" role="status"><span class="visually-hidden">Loading...</span></span>'
           );
         },
         success: function (data) {
-          /*console.log(id + " " + ascdesc + " " + page + " " + model);*/
           $("#tablastock").html(data);
           $("#filterModel").after(
             "<form action='functions.php' method ='post'><input type ='hidden' name='model' value =" +
               model +
-              "><button type='submit' class='btn btn-primary' name='exportarByModel'>Exportar este modelo<i class='bi bi-arrow-right-short'></i></button></form>"
+              "><button type='button' class='btn btn-primary' name='exportarByModel' id='exportarByModel'>Exportar este modelo<i class='bi bi-arrow-right-short'></i>" +
+              "<span id='exportarModelSpinner' class='spinner-border spinner-border-sm ms-2 d-none' role='status' aria-hidden='true'></span>" +
+              "</button><div class='form-group'><input type='checkbox' name='stock0modelo' id='stock0modelo'><label for='stock0modelo'>Incluir Fundas con Stock 0</label></div></form>"
           );
+          // Re-initialize Choices.js on #filterModel
+          if (window.choicesInstance) {
+            window.choicesInstance.destroy();
+          }
+          window.choicesInstance = new Choices(document.getElementById("filterModel"));
           $("#" + id + ".ordenar").addClass("active");
         },
       });
@@ -563,9 +583,138 @@ $(document).ready(function () {
       },
     });
   });
- 
+
   $("#datepickerDiv").on("focus", ".datepicker", function () {
     $("#datepicker").datepicker();
+  });
+  $("#exportarBtn").on("click", function (e) {
+    e.preventDefault();
+    $("#exportarSpinner").removeClass("d-none").show();
+    $("#exportarBtn").prop("disabled", true);
+    var form = $(this).closest("form");
+    $.ajax({
+      url: form.attr("action"),
+      type: "POST",
+      data: form.serialize() + "&exportar=1",
+      xhrFields: {
+        responseType: "blob",
+      },
+      success: function (blob, status, xhr) {
+        var filename = "";
+        var disposition = xhr.getResponseHeader("Content-Disposition");
+        if (disposition && disposition.indexOf("filename=") !== -1) {
+          filename = disposition.split("filename=")[1].replace(/['\"]/g, "");
+        } else {
+          filename = "data_export.csv";
+        }
+        var link = document.createElement("a");
+        var url = window.URL.createObjectURL(blob);
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(function () {
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(link);
+        }, 100);
+        $("#exportarSpinner").addClass("d-none").hide();
+        $("#exportarBtn").prop("disabled", false);
+      },
+      error: function () {
+        alert("Error al exportar.");
+        $("#exportarSpinner").addClass("d-none").hide();
+        $("#exportarBtn").prop("disabled", false);
+      },
+    });
+  });
+  $("#datepickerSubmit").on("click", function (e) {
+    e.preventDefault();
+    $("#exportarFechaSpinner").removeClass("d-none").show();
+    $("#datepickerSubmit").prop("disabled", true);
+    var form = $(this).closest("form");
+    $.ajax({
+      url: form.attr("action"),
+      type: "POST",
+      data: form.serialize() + "&datepickerSubmit=1",
+      xhrFields: {
+        responseType: "blob",
+      },
+      success: function (blob, status, xhr) {
+        var filename = "";
+        var disposition = xhr.getResponseHeader("Content-Disposition");
+        if (disposition && disposition.indexOf("filename=") !== -1) {
+          filename = disposition.split("filename=")[1].replace(/['\"]/g, "");
+        } else {
+          filename = "data_export.csv";
+        }
+        var link = document.createElement("a");
+        var url = window.URL.createObjectURL(blob);
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(function () {
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(link);
+        }, 100);
+        $("#exportarFechaSpinner").addClass("d-none").hide();
+        $("#datepickerSubmit").prop("disabled", false);
+      },
+      error: function () {
+        alert("Error al exportar.");
+        $("#exportarFechaSpinner").addClass("d-none").hide();
+        $("#datepickerSubmit").prop("disabled", false);
+      },
+    });
+  });
+  $("#tablastock").on("click", "#exportarByModel", function (e) {
+    e.preventDefault();
+    $("#exportarModelSpinner").removeClass("d-none").show();
+    $("#exportarByModel").prop("disabled", true);
+    var form = $(this).closest("form");
+    $.ajax({
+      url: form.attr("action"),
+      type: "POST",
+      data: form.serialize() + "&exportarByModel=1",
+      xhrFields: {
+        responseType: "blob",
+      },
+      success: function (blob, status, xhr) {
+        var filename = "";
+        var disposition = xhr.getResponseHeader("Content-Disposition");
+        if (disposition && disposition.indexOf("filename=") !== -1) {
+          filename = disposition.split("filename=")[1].replace(/['\"]/g, "");
+        } else {
+          filename = "data_export.csv";
+        }
+        var link = document.createElement("a");
+        try {
+          var url = window.URL.createObjectURL(blob);
+        } catch (error) {
+          console.error("Error creating object URL:", error);
+          alert("Error al exportar. Posiblemente no existan referencias");
+          $("#exportarModelSpinner").addClass("d-none").hide();
+          $("#exportarByModel").prop("disabled", false);
+          location.reload();
+          return;
+        }
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(function () {
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(link);
+        }, 100);
+        $("#exportarModelSpinner").addClass("d-none").hide();
+        $("#exportarByModel").prop("disabled", false);
+      },
+      error: function () {
+        alert("Error al exportar.");
+        $("#exportarModelSpinner").addClass("d-none").hide();
+        $("#exportarByModel").prop("disabled", false);
+      },
+    });
   });
   const choices = new Choices(document.getElementById("filterModel"));
 });
@@ -575,7 +724,7 @@ function selectModel(val) {
   $.post("ajaxData.php", { nombreModelo: val }, function (data) {
     var array = JSON.parse(data);
     $("#modeloref").attr("value", array.refModelo);
-    $("#marcas").val(array.refMarca).change();
-    $("#year").val(array.refYear).change();
+    $("#marcas").val(array.idMarca).change();
+    $("#year").val(array.idYear).change();
   });
 }

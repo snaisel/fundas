@@ -19,12 +19,12 @@ $con = getdb();
             <main>
                 <div id="tablamodelos">
                 <?php
-                if (!empty($_GET)) {;
-                    echo get_tabla_modelos("idModelo", "ASC", 1, 20,null,null,null,$_GET['idModelo']);
+                if (!empty($_GET)) {
+                    echo Modelo::get_tabla_modelos("idModelo", "ASC", 1, 20,null,null,null,$_GET['idModelo']);
                     echo "<a class='btn btn-primary' href='modelos.php'>Ver todos los modelos</a>";
                 }
                 else{
-                echo get_tabla_modelos();
+                echo Modelo::get_tabla_modelos();
                 }
                 ?>
                 </div>

@@ -5,122 +5,21 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Verifica que los datos POST estén presentes
-if (isset($_POST['idMarca']) && isset($_POST['nombreMarca'])) {
-    $idMarca = $_POST['idMarca'];
-    $nombreMarca = $_POST['nombreMarca'];
-    // Conexión a la base de datos
-    $conn = getdb();
-    // Verifica la conexión
-    if ($conn->connect_error) {
-        die("Conexión fallida: " . $conn->connect_error);
-    }
-    // Actualizar la marca
-    $sql = "UPDATE marca SET nombreMarca = ? WHERE idMarca = ?";
-    $stmt = $conn->prepare($sql);
-
-    if ($stmt === false) {
-        die("Error en la preparación de la consulta: " . $conn->error);
-    }
-    $stmt->bind_param("si", $nombreMarca, $idMarca);
-    if ($stmt->execute()) {
-        echo "Registro actualizado exitosamente";
-    } else {
-        echo "Error al actualizar: " . $stmt->error;
-    }
-    $stmt->close();
-    $conn->close();
-} else {
-    echo "Datos no recibidos correctamente";
-}
-if (isset($_POST['idYear']) && isset($_POST['year'])) {
-    $idYear = $_POST['idYear'];
-    $year = $_POST['year'];
-    $conn = getdb();
-    if ($conn->connect_error) {
-        die("Conexión fallida: " . $conn->connect_error);
-    }
-    $sql = "UPDATE year SET year = ? WHERE idYear = ?";
-    $stmt = $conn->prepare($sql);
-
-    if ($stmt === false) {
-        die("Error en la preparación de la consulta: " . $conn->error);
-    }
-    $stmt->bind_param("si", $year, $idYear);
-    if ($stmt->execute()) {
-        echo "Registro actualizado exitosamente";
-    } else {
-        echo "Error al actualizar: " . $stmt->error;
-    }
-    $stmt->close();
-    $conn->close();
-} else {
-    echo "Datos no recibidos correctamente";
-}
-if (isset($_POST['idModelo']) && isset($_POST['nombreModelo'])) {
-    $idModelo = $_POST['idModelo'];
-    $nombreModelo = $_POST['nombreModelo'];
-    $conn = getdb();
-    if ($conn->connect_error) {
-        die("Conexión fallida: " . $conn->connect_error);
-    }
-    $sql = "UPDATE modelo SET nombreModelo = ? WHERE idModelo = ?";
-    $stmt = $conn->prepare($sql);
-    if ($stmt === false) {
-        die("Error en la preparación de la consulta: " . $conn->error);
-    }
-    $stmt->bind_param("si", $nombreModelo, $idModelo);
-
-    if ($stmt->execute()) {
-        echo "Registro actualizado exitosamente";
-    } else {
-        echo "Error al actualizar: " . $stmt->error;
-    }
-    $stmt->close();
-    $conn->close();
-} else {
-    echo "Datos no recibidos correctamente";
-}
-
-if (isset($_POST['idTipo']) && isset($_POST['nombreTipo']) && isset($_POST['pvp'])) {
-    $conn = getdb();
-    $idTipo = $_POST['idTipo'];
-    $nombreTipo = $_POST['nombreTipo'];
-    $pvp = $_POST['pvp'];
-
-    $sql = "UPDATE tipo SET nombreTipo = ?, pvp = ? WHERE idTipo = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssi", $nombreTipo, $pvp, $idTipo);
-
-    if ($stmt->execute()) {
-        echo "Tipo actualizado exitosamente";
-    } else {
-        echo "Error al actualizar el tipo: " . $stmt->error;
-    }
-
-    $stmt->close();
-    $conn->close();
-} else {
-    echo "Datos no recibidos correctamente";
-}
-if (isset($_POST['idColor']) && isset($_POST['nombreColor'])) {
-    $conn = getdb();
-    $idColor = $_POST['idColor'];
-    $nombreColor = $_POST['nombreColor'];
-    $thumb = $_POST['thumb'];
-
-    $sql = "UPDATE color SET nombreColor = ?, thumb = ? WHERE idColor = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssi", $nombreColor, $thumb, $idColor);
-
-    if ($stmt->execute()) {
-        echo "Color actualizado exitosamente";
-    } else {
-        echo "Error al actualizar el color: " . $stmt->error;
-    }
-
-    $stmt->close();
-    $conn->close();
+if (isset($_POST['idMarca']) && isset($_POST['nombreMarca']) && isset($_POST['refMarca'])) {
+    $marca = new Marca($_POST['idMarca'], $_POST['nombreMarca'], $_POST['refMarca']);
+    echo $marca->update_marca();  
+} else if (isset($_POST['idYear']) && isset($_POST['yearName'])) {
+    $year = new Year($_POST['idYear'], $_POST['yearName'], $_POST['refYear']);
+    echo $year->update_year();
+} else if (isset($_POST['idModelo']) && isset($_POST['nombreModelo']) && isset($_POST['refModelo'])) {
+    $modelo = new Modelo($_POST['idModelo'], $_POST['nombreModelo'], $_POST['marcas'], $_POST['year'], $_POST['refModelo']);
+    echo $modelo->update_modelo();
+} else if (isset($_POST['idTipo']) && isset($_POST['nombreTipo']) && isset($_POST['refTipo']) && isset($_POST['pvp'])) {
+    $tipo = new Tipo($_POST['idTipo'], $_POST['nombreTipo'], $_POST['pvp'],$_POST['refTipo']);
+    echo $tipo->update_tipo();
+} else if (isset($_POST['idColor']) && isset($_POST['nombreColor']) && isset($_POST['refColor']) && isset($_POST['thumb'])) {
+    $color = new Color($_POST['idColor'], $_POST['nombreColor'], $_POST['refColor'], $_POST['thumb']);
+    echo $color->update_color();
 } else {
     echo "Datos no recibidos correctamente";
 }
