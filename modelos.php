@@ -18,8 +18,62 @@ $con = getdb();
             <?php include 'header.php'; ?>
             <main>
                 <div id="tablamodelos">
-                <?php echo get_tabla_modelos() ?>
+                <?php
+                if (!empty($_GET)) {
+                    echo Modelo::get_tabla_modelos("idModelo", "ASC", 1, 20,null,null,null,$_GET['idModelo']);
+                    echo "<a class='btn btn-primary' href='modelos.php'>Ver todos los modelos</a>";
+                }
+                else{
+                echo Modelo::get_tabla_modelos();
+                }
+                ?>
                 </div>
+                <!-- Modal editar Modelo -->
+                        <div class="modal fade" id="resumenModelo" tabindex="-1" aria-labelledby="resumenModeloModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="resumenModeloModalLabel">Resumen del Modelo</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                     
+                                    </div>
+                                    <div class="modal-footer">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
             </main>
+            <script>
+                $(document).ready(function() {
+                    $('#tablamodelos').on('click', '.botonresumen', function() {
+                        var idModelo = $(this).val();
+                        $('#resumenModelo').modal('show');
+                        $.ajax({
+                            url: 'ajaxData_1.php',
+                            type: 'post',
+                            data: {modalResumenModelos:true, idModelo: idModelo},
+                            success: function(response) {
+                                $('#resumenModelo .modal-body').html(response);
+                            }
+                        });
+                    });
+                    $('#tablamodelos').on('click', '.botoneliminar', function() {
+                        if (confirm("¿Estás seguro de que deseas eliminar todas las fundas de este modelo?")) {
+                            var idModelo = $(this).val();
+                            $.ajax({
+                                url: 'ajaxData_1.php',
+                                type: 'post',
+                                data: {borrarFundas:true, idModelo: idModelo},
+                                success: function(response) {
+                                    // Recargar la tabla de modelos después de eliminar
+                                    $('#tablamodelos').html(response);
+                                }
+                            });
+                        }
+                    });
+                });
+            </script>
     </body>
 </html>

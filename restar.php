@@ -55,7 +55,7 @@ location.reload();
                                 <label class="form-check-label" for="resetAll">
                                     Resetear Todos</label>
                             </div>
-                            <div class="form-group"><?php echo select_marcas(); ?></div>
+                            <div class="form-group"><?php echo Marca::select_marcas(); ?></div>
                         </div>
                         <input type="hidden" name="submitReset" value="reseteo"><br>
                         <input type="submit" value="Enviar" id="submitReset" onclick="confirmarEnvio(event);">

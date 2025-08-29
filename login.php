@@ -81,7 +81,7 @@
 if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == true) {
     
 } else {
-    echo "Inicia Sesion para acceder a este contenido.<br>";
+    echo "<div style='text-align: center; margin-top: 20px;'>Inicia Sesion para acceder a este contenido.<br>";
     ?>
     <!-- login -->
     <div id="id01" class="panel">
