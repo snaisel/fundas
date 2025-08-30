@@ -45,7 +45,7 @@ if (isset($_POST['changeModelos'])) {
         echo Year::select_year(Year::get_idYear_by_modelo($_POST['idModelo']));
     }
 }
-if (isset($_POST['refColor'])) {
+if (isset($_POST['refColor']) && ($_POST['refTipo'] != "") && ($_POST['refModelo'] != "")) {
     $stock = Stock::get_stock_items($_POST['refModelo'], $_POST['refTipo'], $_POST['refColor']);
     echo '<input type="number" name="stock" value="' . $stock . '" required>';
 }
@@ -68,7 +68,8 @@ if (!empty($_POST["keyword"])) {
                 <?php
                 foreach ($result as $row) {
                     ?>
-                    <a href="#" class="list-group-item list-group-item-action" onclick="selectModel('<?php echo $row["nombreModelo"]; ?>');"><?php echo $row["nombreModelo"]; ?></a>
+                    <a href="#" class="list-group-item list-group-item-action"
+                        onclick="selectModel('<?php echo $row["nombreModelo"]; ?>');"><?php echo $row["nombreModelo"]; ?></a>
                 <?php } ?>
             </div>
             <?php
@@ -106,20 +107,18 @@ if (!empty($_POST["idStockEditar"])) {
                 <div class="card-body">
                     <div class="row">
                         <div class="form-group col-sm-4">
-                            <input
-                            type="hidden" value="<?php echo $_POST["idStockEditar"]; ?>" name="idStock">
-                        <?php
-                        echo "Marcas" . Marca::select_marcas(Marca::get_idMarca_by_modelo($row['idModelo']));
-                        echo "Año" . Year::select_year(Year::get_idYear_by_modelo($row['idModelo']));
-                        echo "Modelo";
-                        echo Modelo::select_modelos_by_id($row['idModelo']);
-                        ?>
-                        </div>
-                        <div
-                            class="form-group col-sm-4"><?php
-                            echo "Tipo" . Tipo::select_tipo($row['idTipo']);
-                            echo "Color" . Color::select_color($row['idColor']);
+                            <input type="hidden" value="<?php echo $_POST["idStockEditar"]; ?>" name="idStock">
+                            <?php
+                            echo "Marcas" . Marca::select_marcas(Marca::get_idMarca_by_modelo($row['idModelo']));
+                            echo "Año" . Year::select_year(Year::get_idYear_by_modelo($row['idModelo']));
+                            echo "Modelo";
+                            echo Modelo::select_modelos_by_id($row['idModelo']);
                             ?>
+                        </div>
+                        <div class="form-group col-sm-4"><?php
+                        echo "Tipo" . Tipo::select_tipo($row['idTipo']);
+                        echo "Color" . Color::select_color($row['idColor']);
+                        ?>
                         </div>
                         <div class="form-group col-sm-4">
                             Stock
@@ -150,8 +149,7 @@ if (isset($_POST['resetFormulario'])) {
     ?>
     <div class="card-body">
         <div class="row">
-            <div
-                class="form-group col-sm-4">
+            <div class="form-group col-sm-4">
                 <?php
                 echo "Marcas" . Marca::select_marcas();
                 echo "Año" . Year::select_year();
@@ -283,12 +281,11 @@ if (isset($_POST['idYearEditar'])) {
     $conn->close();
 }
 if (isset($_POST['idModeloEditar'])) {
-    $idModelo = $_POST['idModeloEditar'];
     $conn = getdb();
     // Consulta SQL
     $sql = "SELECT * FROM modelo WHERE idModelo = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $idModelo);
+    $stmt->bind_param("i", $_POST['idModeloEditar']);
     $stmt->execute();
     $result = $stmt->get_result();
     if ($result->num_rows > 0) {

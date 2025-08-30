@@ -12,7 +12,7 @@ if (isset($_POST['idMarca']) && isset($_POST['nombreMarca']) && isset($_POST['re
     $year = new Year($_POST['idYear'], $_POST['yearName'], $_POST['refYear']);
     echo $year->update_year();
 } else if (isset($_POST['idModelo']) && isset($_POST['nombreModelo']) && isset($_POST['refModelo'])) {
-    $modelo = new Modelo($_POST['idModelo'], $_POST['nombreModelo'], $_POST['marcas'], $_POST['year'], $_POST['refModelo']);
+    $modelo = new Modelo($_POST['idModelo'], $_POST['nombreModelo'], $_POST['selectMarcas'], $_POST['selectYear'], $_POST['refModelo']);
     echo $modelo->update_modelo();
 } else if (isset($_POST['idTipo']) && isset($_POST['nombreTipo']) && isset($_POST['refTipo']) && isset($_POST['pvp'])) {
     $tipo = new Tipo($_POST['idTipo'], $_POST['nombreTipo'], $_POST['pvp'],$_POST['refTipo']);
