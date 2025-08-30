@@ -719,8 +719,8 @@ class Modelo {
                     }
                 }
                 echo "<li class='list-group-item'><a href='modelos.php?get_tabla=modelos&idModelo=" . $row['idModelo'] . "' class='btn btn-primary resumenModelo' id='" . $row['idModelo'] . "'>" . Modelo::get_refCompleta_by_idModelo($row['idModelo']) . " - " . $row['nombreModelo'] . "</a>";
-                echo "<div><button type=button name='editarModelo' value=" . $row['idModelo'] . " class='botonEditarModelos btn btn-sm btn-success'>Editar</button>";
-                echo "<button type=button name='eliminarModelo' value=" . $row['idModelo'] . " class='botonEliminarModelos btn btn-sm btn-danger'>Eliminar</button>";
+                echo "<div><button type=button name='editarModelo' value='" . $row['idModelo'] . "' class='botonEditarModelos btn btn-sm btn-success'>Editar</button>";
+                echo "<button type=button name='eliminarModelo' value='" . $row['idModelo'] . "' class='botonEliminarModelos btn btn-sm btn-danger'>Eliminar</button>";
                 echo "<div></li>";
             }
             echo "</ul>";

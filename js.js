@@ -65,10 +65,21 @@ $(document).ready(function () {
   $("#formularioStock").on("change", "#selectModelos", function () {
     $("#selectModelos option:selected").each(function () {
       var modelID = $(this).val();
+      var colorID = $("#color").val();
+      var tipoID = $("#tipo").val();
+      if (colorID && tipoID) {
+        $.post(
+          "ajaxData.php",
+          { refModelo: modelID, refTipo: tipoID, refColor: colorID },
+          function (data) {
+            $("#stock").html(data);
+          }
+        );
+      }
       if (modelID) {
         $.post(
           "ajaxData.php",
-          { idModelo: modelID, changeModelos: true },
+          { idModelo: modelID, changeModelos: true},
           function (data) {
             $("#selectYear").html(data);
           }
@@ -88,6 +99,24 @@ $(document).ready(function () {
       var modelID = $("#selectModelos").val();
       var tipoID = $("#tipo").val();
       if (colorID) {
+        $.post(
+          "ajaxData.php",
+          { refModelo: modelID, refTipo: tipoID, refColor: colorID },
+          function (data) {
+            $("#stock").html(data);
+          }
+        );
+      } else {
+        $("#stock").html('<input type="number" name="stock" required>');
+      }
+    });
+  });
+  $("#tipo").on("change", function () {
+    $("#tipo option:selected").each(function () {
+      var tipoID = $(this).val();
+      var modelID = $("#selectModelos").val();
+      var colorID = $("#color").val();
+      if (tipoID) {
         $.post(
           "ajaxData.php",
           { refModelo: modelID, refTipo: tipoID, refColor: colorID },
@@ -366,8 +395,8 @@ $(document).ready(function () {
           document.getElementById("idModelo").value = data.idModelo;
           document.getElementById("nombreModelo").value = data.nombreModelo;
           document.getElementById("refModelo").value = data.refModelo;
-          document.getElementById("year").value = data.idYear;
-          document.getElementById("marcas").value = data.idMarca;
+          document.getElementById("selectYear").value = data.idYear;
+          document.getElementById("selectMarcas").value = data.idMarca;
           var myModal = new bootstrap.Modal(
             document.getElementById("editarModeloModal")
           );
@@ -510,7 +539,9 @@ $(document).ready(function () {
           if (window.choicesInstance) {
             window.choicesInstance.destroy();
           }
-          window.choicesInstance = new Choices(document.getElementById("filterModel"));
+          window.choicesInstance = new Choices(
+            document.getElementById("filterModel")
+          );
           $("#" + id + ".ordenar").addClass("active");
         },
       });
@@ -716,7 +747,9 @@ $(document).ready(function () {
       },
     });
   });
-  const choices = new Choices(document.getElementById("filterModel"));
+  if($('#tablastock').length>0){
+    const choices = new Choices(document.getElementById("filterModel"));
+  }
 });
 function selectModel(val) {
   $("#search-box").val(val);

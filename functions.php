@@ -32,7 +32,7 @@ if (isset($_POST['addtipo'])) {
     echo "<script type=\"text/javascript\">alert(\"$response\");window.location = \"opciones.php\"</script>";
 }
 if (isset($_POST['addmodelo'])) {
-    $modelo = new Modelo(null, $_POST['modelo'], $_POST['marcas'], $_POST['year'], $_POST['modeloref']);
+    $modelo = new Modelo(null, $_POST['modelo'], $_POST['selectMarcas'], $_POST['selectYear'], $_POST['modeloref']);
     $message = $modelo->set_modelo();
     echo "<script type=\"text/javascript\">alert(\"$message\");window.location = \"opciones.php\"
                </script>";
@@ -154,11 +154,10 @@ if (isset($_POST['submitReset'])) {
         $sql = "UPDATE `stock` SET `stock`= 0, `modificado`='" . date('Y-m-d') . "'";
         $result1 = mysqli_query($con, $sql);
         echo "<script type=\"text/javascript\">alert(\"Todo ha sido puesto a 0.\");window.location = \"restar.php\"</script>";
-    } else if (isset($_POST['marcas']) && $_POST['marcas'] != null) {
-        $id = Marca::get_marca_id($_POST['marcas']);
-        $sql = "UPDATE `stock` SET `stock`= 0, `modificado`='" . date('Y-m-d') . "' WHERE `idMarca` = " . $id;
+    } else if (isset($_POST['selectMarcas']) && $_POST['selectMarcas'] != null) {
+        $sql = "UPDATE `stock` s INNER JOIN `modelo` m ON s.idModelo = m.idModelo SET s.`stock`= 0, s.`modificado`='" . date('Y-m-d') . "' WHERE m.`idMarca` = " . $_POST['selectMarcas'];
         $result1 = mysqli_query($con, $sql);
-        echo "<script type=\"text/javascript\">alert(\"La marca " . Marca::get_marca_name($_POST['marcas']) . " ha sido puesta a 0.\");window.location = \"restar.php\"</script>";
+        echo "<script type=\"text/javascript\">alert(\"La marca " . Marca::get_marca_name_by_id($_POST['selectMarcas']) . " ha sido puesta a 0.\");window.location = \"restar.php\"</script>";
     } else {
         echo "<script type=\"text/javascript\">alert(\"No se ha hecho nada. No se ha elegido nada.\");window.location = \"restar.php\"</script>";
     }
