@@ -761,3 +761,10 @@ function selectModel(val) {
     $("#year").val(array.idYear).change();
   });
 }
+document.addEventListener('hidden.bs.modal', function () {
+    if (!document.querySelector('.modal.show')) { 
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = 'auto';
+        document.body.style.paddingRight = '';
+    }
+});
