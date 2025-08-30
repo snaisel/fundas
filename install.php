@@ -22,15 +22,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['step'])) {
             mysqli_query($conn, "CREATE DATABASE IF NOT EXISTS `$db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;");
             mysqli_select_db($conn, $db);
             $sqls = [
-                // Tablas según el esquema proporcionado
-                "CREATE TABLE IF NOT EXISTS `marca` ( `idMarca` int(11) NOT NULL AUTO_INCREMENT, `nombreMarca` varchar(50) NOT NULL, `refMarca` int(2) NOT NULL, PRIMARY KEY (`idMarca`), UNIQUE KEY `ref` (`refMarca`), KEY `refMarca` (`refMarca`) ) ENGINE=InnoDB;",
-                "CREATE TABLE IF NOT EXISTS `year` ( `idYear` int(2) NOT NULL AUTO_INCREMENT, `year` int(4) NOT NULL, `refYear` int(2) NOT NULL, PRIMARY KEY (`idYear`), UNIQUE KEY `refYear` (`refYear`), KEY `refYear_2` (`refYear`) ) ENGINE=InnoDB;",
-                "CREATE TABLE IF NOT EXISTS `modelo` ( `idModelo` int(11) NOT NULL AUTO_INCREMENT, `nombreModelo` varchar(80) NOT NULL, `refModelo` int(11) NOT NULL, `refMarca` int(2) NOT NULL, `refYear` int(2) NOT NULL, PRIMARY KEY (`idModelo`) ) ENGINE=InnoDB;",
-                "CREATE TABLE IF NOT EXISTS `tipo` ( `idTipo` int(11) NOT NULL AUTO_INCREMENT, `nombreTipo` varchar(50) NOT NULL, `refTipo` int(2) NOT NULL, `pvp` decimal(10,2) NOT NULL, PRIMARY KEY (`idTipo`), UNIQUE KEY `refTipo` (`refTipo`) ) ENGINE=InnoDB;",
-                "CREATE TABLE IF NOT EXISTS `color` ( `idColor` int(11) NOT NULL AUTO_INCREMENT, `nombreColor` varchar(50) NOT NULL, `refColor` int(11) NOT NULL, `thumb` varchar(150) NOT NULL, PRIMARY KEY (`idColor`) ) ENGINE=InnoDB;",
-                "CREATE TABLE IF NOT EXISTS `stock` ( `idStock` int(11) NOT NULL AUTO_INCREMENT,  `idModelo` INT(11) NOT NULL, `refModel` int(6) NOT NULL, `refTipo` int(2) NOT NULL, `refColor` int(2) NOT NULL, `stock` int(2) NOT NULL, `usarRel` tinyint(1) NOT NULL DEFAULT 0, `idMarca` int(11) NOT NULL, `idRel` int(11) NOT NULL, `modificado` date DEFAULT NULL, PRIMARY KEY (`idStock`) ) ENGINE=InnoDB;",
-                "CREATE TABLE IF NOT EXISTS `relacionados` ( `idRel` int(11) NOT NULL AUTO_INCREMENT, `referencias` mediumtext NOT NULL, PRIMARY KEY (`idRel`) ) ENGINE=InnoDB;",
-                "CREATE TABLE IF NOT EXISTS `usuarios` ( `idUsuario` INT(3) NOT NULL AUTO_INCREMENT, `usuario` VARCHAR(25) NOT NULL, `password` VARCHAR(128) NOT NULL, `lastLog` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (`idUsuario`) ) ENGINE=InnoDB;"
+                // CREATE TABLES
+                "CREATE TABLE IF NOT EXISTS `color` ( `idColor` int(11) NOT NULL, `nombreColor` varchar(50) NOT NULL, `refColor` int(11) NOT NULL, `thumb` varchar(150) NOT NULL ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;",
+                "CREATE TABLE IF NOT EXISTS `marca` ( `idMarca` int(11) NOT NULL, `nombreMarca` varchar(50) NOT NULL, `refMarca` int(2) NOT NULL ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;",
+                "CREATE TABLE IF NOT EXISTS `modelo` ( `idModelo` int(11) NOT NULL, `nombreModelo` varchar(80) NOT NULL, `idMarca` int(11) NOT NULL, `idYear` int(11) NOT NULL, `refModelo` int(2) NOT NULL ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;",
+                "CREATE TABLE IF NOT EXISTS `relacionados` ( `idRel` int(11) NOT NULL, `idsRelacionados` mediumtext NOT NULL ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;",
+                "CREATE TABLE IF NOT EXISTS `stock` ( `idStock` int(11) NOT NULL, `idModelo` int(11) NOT NULL, `idTipo` int(11) NOT NULL, `idColor` int(11) NOT NULL, `stock` int(2) NOT NULL, `usarRel` tinyint(1) NOT NULL DEFAULT 0, `idRel` int(11) NOT NULL, `modificado` date DEFAULT NULL ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;",
+                "CREATE TABLE IF NOT EXISTS `tipo` ( `idTipo` int(11) NOT NULL, `nombreTipo` varchar(50) NOT NULL, `refTipo` int(2) NOT NULL, `pvp` decimal(10,2) NOT NULL ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;",
+                "CREATE TABLE IF NOT EXISTS `usuarios` ( `idUsuario` int(3) NOT NULL, `usuario` varchar(25) NOT NULL, `password` varchar(128) NOT NULL, `lastLog` datetime NOT NULL DEFAULT current_timestamp() ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;",
+                "CREATE TABLE IF NOT EXISTS `year` ( `idYear` int(2) NOT NULL, `year` int(4) NOT NULL, `refYear` int(2) NOT NULL ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;",
+                // ALTER TABLES (add primary keys, unique, keys)
+                "ALTER TABLE `color` ADD PRIMARY KEY (`idColor`), ADD UNIQUE KEY `refColor` (`refColor`);",
+                "ALTER TABLE `marca` ADD PRIMARY KEY (`idMarca`), ADD UNIQUE KEY `refMarca` (`refMarca`);",
+                "ALTER TABLE `modelo` ADD PRIMARY KEY (`idModelo`);",
+                "ALTER TABLE `relacionados` ADD PRIMARY KEY (`idRel`);",
+                "ALTER TABLE `stock` ADD PRIMARY KEY (`idStock`);",
+                "ALTER TABLE `tipo` ADD PRIMARY KEY (`idTipo`), ADD UNIQUE KEY `refTipo` (`refTipo`);",
+                "ALTER TABLE `usuarios` ADD PRIMARY KEY (`idUsuario`);",
+                "ALTER TABLE `year` ADD PRIMARY KEY (`idYear`), ADD UNIQUE KEY `refYear` (`refYear`);",
+                // ALTER TABLES (set auto_increment)
+                "ALTER TABLE `color` MODIFY `idColor` int(11) NOT NULL AUTO_INCREMENT;",
+                "ALTER TABLE `marca` MODIFY `idMarca` int(11) NOT NULL AUTO_INCREMENT;",
+                "ALTER TABLE `modelo` MODIFY `idModelo` int(11) NOT NULL AUTO_INCREMENT;",
+                "ALTER TABLE `relacionados` MODIFY `idRel` int(11) NOT NULL AUTO_INCREMENT;",
+                "ALTER TABLE `stock` MODIFY `idStock` int(11) NOT NULL AUTO_INCREMENT;",
+                "ALTER TABLE `tipo` MODIFY `idTipo` int(11) NOT NULL AUTO_INCREMENT;",
+                "ALTER TABLE `usuarios` MODIFY `idUsuario` int(3) NOT NULL AUTO_INCREMENT;",
+                "ALTER TABLE `year` MODIFY `idYear` int(2) NOT NULL AUTO_INCREMENT;"
             ];
             $ok = true;
             foreach ($sqls as $sql) {

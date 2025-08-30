@@ -37,7 +37,7 @@ location.reload();
             <div class="row justify-content-center">
                 <div class="col-md-6">
                     <h2>Restar Stock</h2>
-                <p>Introduce el código del modelo a restar.</p>
+                    <p>Introduce el código del modelo a restar.</p>
                     <form action="functions.php" method="post" id="formularioRestar">
                         <input type="text" name="textoRestar" id="textoRestar">
                         <input type="submit" name="submitRestar" id="submitRestar" value="Restar">
